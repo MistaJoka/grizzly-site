@@ -1,0 +1,78 @@
+---
+import siteConfig, { credentialList } from '../../site.config';
+import { getCollection } from 'astro:content';
+import PageLayout from '../layouts/PageLayout.astro';
+import Container from '../components/primitives/Container.astro';
+import Eyebrow from '../components/primitives/Eyebrow.astro';
+import ClosingCTA from '../components/sections/ClosingCTA.astro';
+import { breadcrumbJsonLd } from '../lib/schema';
+import { canonical } from '../lib/seo';
+
+const testimonials = (await getCollection('testimonials')).sort((a, b) => a.data.order - b.data.order);
+const years = new Date().getFullYear() - siteConfig.business.foundedYear;
+
+const jsonLd = breadcrumbJsonLd([
+  { name: 'Home', url: canonical('/', Astro.site) },
+  { name: 'About', url: canonical('/about', Astro.site) },
+]);
+---
+<PageLayout
+  title={`${siteConfig.business.operator}, owner and operator.`}
+  eyebrow="About"
+  lede={`${years} years in business in Miami-Dade. The owner quotes the job, does the job, and is the person you call afterward.`}
+  description={`${siteConfig.business.name} is a Miami landscaping company owned and run by ${siteConfig.business.operator}.`}
+  jsonLd={jsonLd}
+>
+  <Container width="text" class="py-16 text-[length:var(--step-1)] text-ink-muted">
+    <p>
+      {siteConfig.business.legalName} is a Florida limited liability company based in Miami, formed in
+      {siteConfig.business.foundedYear}. It is owned and run by {siteConfig.business.operator}, who is on
+      every job, so there is one point of contact from the first message to the final cleanup.
+    </p>
+    <p class="mt-6">
+      The company has completed hundreds of residential jobs, mostly mowing, trimming, mulching, cleanup
+      and pressure washing, and has taken on larger work too, including a 40-tree installation with
+      25-gallon trees.
+    </p>
+    <p class="mt-6">
+      Customers can expect a business that shows up on time, takes care around sprinklers, pets and yard
+      objects, and cleans up after the work.
+    </p>
+  </Container>
+
+  <section aria-label="Credentials" class="bg-paper-raised py-16">
+    <Container>
+      <Eyebrow>Credentials</Eyebrow>
+      <ul class="mt-8 divide-y divide-stone border-t border-stone">
+        {credentialList(siteConfig).map((credential) => (
+          <li class="py-5 text-[length:var(--step-1)]">{credential}</li>
+        ))}
+      </ul>
+    </Container>
+  </section>
+
+  {testimonials.length > 0 && (
+    <section aria-label="What clients say" class="bg-paper py-20">
+      <Container>
+        <Eyebrow>What clients say</Eyebrow>
+        <ul class="mt-10 grid gap-10 md:grid-cols-2">
+          {testimonials.map((testimonial) => (
+            <li class="reveal border-t border-stone pt-6">
+              <figure>
+                <blockquote class="text-[length:var(--step-1)]">&ldquo;{testimonial.data.quote}&rdquo;</blockquote>
+                <figcaption class="mt-4 text-[length:var(--step--1)] text-ink-muted">
+                  {testimonial.data.attribution}, {testimonial.data.town}
+                </figcaption>
+              </figure>
+            </li>
+          ))}
+        </ul>
+      </Container>
+    </section>
+  )}
+
+  <ClosingCTA
+    headline="Tell us about your property."
+    body="Describe the job and send a photo if you can. Alex reviews every request and sends you a quote."
+  />
+</PageLayout>

@@ -1,0 +1,95 @@
+---
+import { getCollection } from 'astro:content';
+import siteConfig, { credentialList } from '../../site.config';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BeforeAfter from '../components/sections/BeforeAfter.astro';
+import ClosingCTA from '../components/sections/ClosingCTA.astro';
+import Container from '../components/primitives/Container.astro';
+import Eyebrow from '../components/primitives/Eyebrow.astro';
+import Button from '../components/primitives/Button.astro';
+import Hero from '../components/sections/Hero.astro';
+import OfferingStrip from '../components/sections/OfferingStrip.astro';
+import ProcessSteps from '../components/sections/ProcessSteps.astro';
+import Proof from '../components/sections/Proof.astro';
+import ServiceAreaList from '../components/sections/ServiceAreaList.astro';
+
+const byOrder = <T extends { data: { order: number } }>(a: T, b: T) => a.data.order - b.data.order;
+
+const services = (await getCollection('services')).sort(byOrder).map((service) => ({
+  slug: service.id,
+  title: service.data.title,
+  summary: service.data.summary,
+  imagePath: service.data.heroImage,
+  imageAlt: service.data.heroAlt,
+}));
+
+// Before/after only appears for a project that really has both photos.
+const withPhotos = (await getCollection('projects'))
+  .sort(byOrder)
+  .find((p) => p.data.beforeImage && p.data.afterImage && p.data.beforeAlt && p.data.afterAlt);
+
+const areas = (await getCollection('areas')).sort(byOrder).map((area) => ({
+  slug: area.id,
+  town: area.data.town,
+  state: area.data.state,
+}));
+
+// Testimonials ship empty. The first real, permissioned one (if any) is shown.
+const testimonials = (await getCollection('testimonials')).sort(byOrder);
+const lead = testimonials[0];
+
+const steps = [
+  { title: 'Send a request', body: 'Tell us what you need and where. A photo of the yard helps, but it is optional.' },
+  { title: 'Get a quote from Alex', body: 'Alex reviews the request himself and sends you a price for the job.' },
+  { title: 'The job gets done', body: 'The owner is on the job, and the property is cleaned up before we leave.' },
+];
+---
+<BaseLayout transparentHeader>
+  <Hero
+    headline="Lawn care and tree installs across Miami-Dade."
+    lede="Grizzly Lawn Care is run by Alex Bermudez: lawn maintenance, bush and hedge trimming, mulching, pressure washing, and tree and plant installs for homes, HOAs and commercial properties."
+    imagePath="/images/hero.jpg"
+    imageAlt="A manicured South Florida lawn bordered by planting beds."
+  />
+  <OfferingStrip services={services} />
+  {withPhotos && (
+    <BeforeAfter
+      title="The same property, before and after."
+      project={{
+        title: withPhotos.data.title,
+        town: withPhotos.data.town ?? 'Miami-Dade',
+        beforeImage: withPhotos.data.beforeImage!,
+        beforeAlt: withPhotos.data.beforeAlt!,
+        afterImage: withPhotos.data.afterImage!,
+        afterAlt: withPhotos.data.afterAlt!,
+      }}
+    />
+  )}
+  <ProcessSteps steps={steps} />
+
+  <section aria-label="Commercial and HOA" class="bg-paper-raised py-20 md:py-32">
+    <Container>
+      <Eyebrow>Commercial &amp; HOA</Eyebrow>
+      <div class="mt-4 grid gap-10 md:grid-cols-[3fr_2fr] md:items-end">
+        <h2 class="max-w-[20ch] text-[length:var(--step-4)]">Larger jobs for contractors, HOAs and property managers.</h2>
+        <div>
+          <p class="text-[length:var(--step-1)] text-ink-muted">
+            Tree installs in 25-gallon containers, commercial grounds maintenance, and a recent 40-tree installation.
+          </p>
+          <div class="mt-6"><Button href="/commercial" variant="ghost">See the capabilities</Button></div>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <Proof
+    testimonial={lead ? { quote: lead.data.quote, attribution: lead.data.attribution, town: lead.data.town } : undefined}
+    credentials={credentialList(siteConfig)}
+    yearsInBusiness={new Date().getFullYear() - siteConfig.business.foundedYear}
+  />
+  <ServiceAreaList areas={areas} />
+  <ClosingCTA
+    headline="Tell us about your property."
+    body="Describe the job and send a photo if you can. Alex reviews every request and sends you a quote."
+  />
+</BaseLayout>
