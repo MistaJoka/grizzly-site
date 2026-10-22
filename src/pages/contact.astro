@@ -1,0 +1,156 @@
+---
+import { getCollection } from 'astro:content';
+import siteConfig from '../../site.config';
+import PageLayout from '../layouts/PageLayout.astro';
+import Container from '../components/primitives/Container.astro';
+import Eyebrow from '../components/primitives/Eyebrow.astro';
+import { breadcrumbJsonLd } from '../lib/schema';
+import { canonical } from '../lib/seo';
+import { withBase } from '../lib/url';
+import { GROUNDWORK_FIELDS as F, GROUNDWORK_LIMITS as L, quoteActionUrl, quotePageUrl } from '../lib/quote';
+
+const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+const areas = (await getCollection('areas')).sort((a, b) => a.data.order - b.data.order);
+
+const action = quoteActionUrl(siteConfig.quote.groundworkQuoteUrl);
+const hostedPage = quotePageUrl(siteConfig.quote.groundworkQuoteUrl);
+const { business } = siteConfig;
+
+const jsonLd = breadcrumbJsonLd([
+  { name: 'Home', url: canonical('/', Astro.site) },
+  { name: 'Contact', url: canonical('/contact', Astro.site) },
+]);
+
+const field = 'mt-2 w-full rounded-xl border border-stone bg-paper-raised px-4 py-3 text-[length:var(--step-0)] focus:border-moss';
+const label = 'block text-[length:var(--step--1)] font-medium';
+---
+<PageLayout
+  title="Request a quote."
+  eyebrow="Contact"
+  lede="Tell us what you need and where. Add a phone number or an email so Alex can reach you, and a photo if it helps."
+  description="Request a quote from Grizzly Lawn Care for lawn maintenance, trimming, mulching, pressure washing, or tree and plant installation in Miami-Dade."
+  jsonLd={jsonLd}
+>
+  <Container class="pb-24">
+    <div class="grid gap-16 md:grid-cols-[3fr_2fr]">
+      {action ? (
+        <div>
+          <!--
+            Plain multipart form, no JavaScript. It posts to the hosted Groundwork route (/r/<slug>/send),
+            which saves the request and redirects the browser to the hosted confirmation page.
+          -->
+          <form
+            id="quote-form"
+            action={action}
+            method="post"
+            enctype="multipart/form-data"
+            class="relative space-y-7"
+            data-testid="quote-form"
+          >
+            <div>
+              <label class={label} for="name">Your name</label>
+              <input class={field} id="name" name={F.name} type="text" autocomplete="name" maxlength="120" required />
+            </div>
+
+            <div class="grid gap-7 sm:grid-cols-2">
+              <div>
+                <label class={label} for="phone">Phone</label>
+                <input class={field} id="phone" name={F.phone} type="tel" autocomplete="tel" maxlength="40" />
+              </div>
+              <div>
+                <label class={label} for="email">Email</label>
+                <input class={field} id="email" name={F.email} type="email" autocomplete="email" maxlength="200" />
+              </div>
+            </div>
+            <p class="-mt-3 text-[length:var(--step--1)] text-ink-muted">A phone number or an email is required.</p>
+
+            <div class="grid gap-7 sm:grid-cols-2">
+              <div>
+                <label class={label} for="address">Address or neighborhood of the job</label>
+                <input class={field} id="address" name={F.address} type="text" list="areas" autocomplete="street-address" maxlength="300" />
+                <datalist id="areas">{areas.map((area) => <option value={area.data.town}></option>)}</datalist>
+              </div>
+              <div>
+                <label class={label} for="service">What do you need?</label>
+                <select class={field} id="service" name={F.service}>
+                  <option value="">Choose one (optional)</option>
+                  {services.map((service) => <option value={service.data.title}>{service.data.title}</option>)}
+                  <option value="Something else">Something else</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class={label} for="message">About the job</label>
+              <textarea class={field} id="message" name={F.message} rows="6" maxlength="2000"></textarea>
+            </div>
+
+            <div>
+              <label class={label} for="preferred_dates">Preferred dates (optional)</label>
+              <input class={field} id="preferred_dates" name={F.preferredDates} type="text" maxlength="200" />
+            </div>
+
+            <div>
+              <label class={label} for="photos">Photos (optional, up to {L.maxPhotos}, {L.maxPhotoMb} MB each)</label>
+              <input class={field} id="photos" name={F.photos} type="file" multiple accept="image/jpeg,image/png,image/webp" />
+            </div>
+
+            <!-- Honeypot: Groundwork silently drops any request where this is filled. Off-screen, not display:none. -->
+            <div class="absolute left-[-9999px] top-0" aria-hidden="true">
+              <label for="website">Website</label>
+              <input id="website" name={F.honeypot} type="text" tabindex="-1" autocomplete="off" />
+            </div>
+
+            <button
+              type="submit"
+              class="rounded-full bg-moss px-8 py-4 text-[length:var(--step-0)] font-medium text-paper transition-colors duration-[var(--dur-fast)] hover:bg-moss-deep"
+            >
+              Send request
+            </button>
+            <p class="text-[length:var(--step--1)] text-ink-muted">
+              Your request is sent to a secure page that confirms it. Limit: {L.ratePerHour} requests per hour from one connection.
+              Prefer the hosted form? <a class="text-moss underline underline-offset-4" href={hostedPage}>Open it here</a>.
+            </p>
+          </form>
+        </div>
+      ) : (
+        <div data-testid="quote-unavailable" class="rounded-2xl border border-stone bg-paper-raised p-8">
+          <h2 class="text-[length:var(--step-2)]">The online quote form is being set up.</h2>
+          <p class="mt-4 text-ink-muted">
+            {business.phone || business.email
+              ? 'In the meantime, call or email and describe the job.'
+              : 'Please check back soon.'}
+          </p>
+        </div>
+      )}
+
+      <aside class="space-y-10">
+        {(business.phone || business.email) && (
+          <div>
+            <Eyebrow>Call or email</Eyebrow>
+            {business.phone && business.phoneHref && (
+              <a href={business.phoneHref} class="mt-4 block text-[length:var(--step-2)] text-moss">{business.phone}</a>
+            )}
+            {business.email && <a href={`mailto:${business.email}`} class="block text-ink-muted">{business.email}</a>}
+          </div>
+        )}
+        {business.hours.length > 0 && (
+          <div>
+            <Eyebrow>Hours</Eyebrow>
+            <ul class="mt-4 space-y-1 text-ink-muted">
+              {business.hours.map((line) => <li>{line}</li>)}
+            </ul>
+          </div>
+        )}
+        <div>
+          <Eyebrow>Service area</Eyebrow>
+          <ul class="mt-4 space-y-1">
+            {areas.map((area) => (
+              <li><a href={withBase(`/areas/${area.id}`)} class="text-ink-muted hover:text-moss">{area.data.town}, {area.data.state}</a></li>
+            ))}
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </Container>
+</PageLayout>
