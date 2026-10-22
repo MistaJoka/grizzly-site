@@ -1,0 +1,54 @@
+---
+import { withBase } from '../lib/url';
+import { ClientRouter } from 'astro:transitions';
+import Footer from '../components/layout/Footer.astro';
+import Header from '../components/layout/Header.astro';
+import SkipLink from '../components/layout/SkipLink.astro';
+import JsonLd from '../components/seo/JsonLd.astro';
+import Meta from '../components/seo/Meta.astro';
+import siteConfig, { isLive } from '../../site.config';
+import { localBusinessJsonLd } from '../lib/schema';
+// Both faces use font-display: swap, so without preloading them the fallback
+// paints first and the display headline reflows when the real font arrives —
+// measurable layout shift on a cold, CPU-throttled connection.
+import instrumentSerif from '@fontsource/instrument-serif/files/instrument-serif-latin-400-normal.woff2?url';
+import interVariable from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  noindex?: boolean;
+  transparentHeader?: boolean;
+  jsonLd?: object | object[];
+}
+const { title, description, ogImage, noindex, transparentHeader = false, jsonLd } = Astro.props;
+
+// Until a real SITE_URL is configured the site must not be indexed.
+const holdBack = !isLive(siteConfig);
+
+const extra = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+const schema = [localBusinessJsonLd(Astro.site), ...extra];
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preload" as="font" type="font/woff2" href={instrumentSerif} crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href={interVariable} crossorigin />
+    <link rel="sitemap" href={withBase("/sitemap-index.xml")} />
+    {holdBack && <meta name="robots" content="noindex, nofollow" />}
+    <Meta title={title} description={description} ogImage={ogImage} noindex={noindex} />
+    <JsonLd schema={schema} />
+    <ClientRouter />
+  </head>
+  <body class="min-h-dvh">
+    <SkipLink />
+    <Header transparent={transparentHeader} />
+    <main id="main"><slot /></main>
+    <Footer />
+    <script>import '../lib/motion.ts';</script>
+  </body>
+</html>
