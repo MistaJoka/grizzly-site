@@ -10,13 +10,16 @@ import Button from '../components/primitives/Button.astro';
 import ClosingCTA from '../components/sections/ClosingCTA.astro';
 import { breadcrumbJsonLd } from '../lib/schema';
 import { canonical } from '../lib/seo';
+import { withBase } from '../lib/url';
 
 const featured = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order)[0];
-const capabilities = [
-  { title: 'Tree & plant installation', body: 'Container trees up to 25 gallons, staking, planting beds and mulch.' },
-  { title: 'Commercial grounds maintenance', body: 'Mowing, edging, trimming and cleanup.' },
-  { title: 'Bush & hedge trimming, mulching, pressure washing', body: 'Handled in the same visit as maintenance where it makes sense.' },
-];
+const capabilities = await Promise.all(
+  [
+    { title: 'Tree & plant installation', body: 'Container trees up to 25 gallons, staking, planting beds and mulch.', href: '/services/tree-plant-installation', art: '/images/services/tree-plant-installation.jpg' },
+    { title: 'Commercial grounds maintenance', body: 'Mowing, edging, trimming and cleanup.', href: '/services/lawn-maintenance', art: '/images/services/lawn-maintenance.jpg' },
+    { title: 'Bush & hedge trimming, mulching, pressure washing', body: 'Handled in the same visit as maintenance where it makes sense.', href: '/services', art: '/images/services/bush-hedge-trimming.jpg' },
+  ].map(async (item) => ({ ...item, image: await resolveImage(item.art) })),
+);
 const why = [
   `${new Date().getFullYear() - siteConfig.business.foundedYear}+ years in continuous operation in Miami-Dade, under the same company name since ${siteConfig.business.foundedYear}`,
   'Owner on every job: one point of contact',
@@ -38,18 +41,31 @@ const jsonLd = breadcrumbJsonLd([
   description="Grizzly Lawn Care capability statement: tree and plant installation, commercial grounds maintenance, and credentials for contractors, HOAs and property managers in Miami-Dade."
   jsonLd={jsonLd}
 >
-  <section aria-label="Capabilities" class="pb-20">
+  <section aria-label="Capabilities" class="pb-24 md:pb-32">
     <Container>
-      <Eyebrow>What we do</Eyebrow>
-      <ul class="mt-10 grid gap-6 md:grid-cols-3">
-        {capabilities.map((item) => (
-          <li class="reveal rounded-[var(--radius-panel)] bg-paper-raised p-7 shadow-[var(--shadow-panel)]">
-            <span aria-hidden="true" class="stripes block h-2 w-10 rounded-full"></span>
-            <h2 class="mt-6 text-[length:var(--step-2)] leading-tight">{item.title}</h2>
-            <p class="mt-3 text-ink-muted">{item.body}</p>
-          </li>
-        ))}
-      </ul>
+      <div class="grid gap-10 md:grid-cols-[4fr_8fr] md:gap-16">
+        <div>
+          <h2 class="max-w-[12ch] text-[length:var(--step-4)]">What we take on.</h2>
+          <p class="mt-5 max-w-[32ch] text-ink-muted">Three lines of work, all quoted and run by the owner.</p>
+        </div>
+        <!-- An index of capabilities: each row is a link with its illustration, and the mowed-stripe fill sweeps in on hover. -->
+        <ul class="border-t border-ink/15">
+          {capabilities.map((item) => (
+            <li class="reveal border-b border-ink/15">
+              <a href={withBase(item.href)} class="group relative isolate grid grid-cols-[5.5rem_1fr] items-center gap-5 overflow-hidden py-6 sm:grid-cols-[8rem_1fr] sm:gap-8 md:py-7">
+                <span aria-hidden="true" class="stripes absolute inset-0 -z-10 origin-left scale-x-0 opacity-25 transition-transform duration-[var(--dur-slow)] ease-[var(--ease-out)] group-hover:scale-x-100"></span>
+                <span class="grain relative block overflow-hidden rounded-[var(--radius-panel)] shadow-[var(--shadow-panel)]">
+                  <Image src={item.image} alt="" widths={[200, 400]} sizes="8rem" loading="lazy" class="aspect-[4/3] w-full object-cover transition-transform duration-[var(--dur-slow)] ease-[var(--ease-out)] group-hover:scale-[1.06]" />
+                </span>
+                <span>
+                  <span class="block font-[family-name:var(--font-display)] text-[length:var(--step-2)] leading-[1.05] sm:text-[length:var(--step-3)]">{item.title}</span>
+                  <span class="mt-2 block max-w-[48ch] text-ink-muted">{item.body}</span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
     </Container>
   </section>
 
@@ -67,7 +83,7 @@ const jsonLd = breadcrumbJsonLd([
               class="aspect-[4/5] w-full rounded-[var(--radius-media)] object-cover shadow-[var(--shadow-panel)]"
             />
             <ul class="relative -mt-16 ml-6 space-y-2 rounded-[var(--radius-panel)] bg-canopy p-6 text-paper shadow-[var(--shadow-panel)] md:absolute md:-bottom-8 md:-right-10 md:m-0 md:w-[18rem]">
-              {featured.data.scope.map((item) => <li class="text-[length:var(--step-0)]">{item}</li>)}
+              {featured.data.scope.map((item) => <li class="text-[length:var(--step--1)] text-paper/85 first:font-[family-name:var(--font-display)] first:text-[length:var(--step-2)] first:leading-tight first:text-paper">{item}</li>)}
             </ul>
           </div>
           <div>
@@ -86,8 +102,13 @@ const jsonLd = breadcrumbJsonLd([
       <div class="grid gap-14 md:grid-cols-2 md:gap-20">
         <div>
           <h2 class="max-w-[14ch] text-[length:var(--step-4)]">Why contractors and managers call us.</h2>
-          <ul class="mt-10 divide-y divide-ink/10 border-y border-ink/10">
-            {why.map((item) => <li class="py-5 text-[length:var(--step-1)]">{item}</li>)}
+          <ul class="mt-10 space-y-6">
+            {why.map((item) => (
+              <li class="flex gap-5 text-[length:var(--step-1)] leading-snug">
+                <span aria-hidden="true" class="stripes mt-[0.45em] block h-2.5 w-8 shrink-0 rounded-full"></span>
+                {item}
+              </li>
+            ))}
           </ul>
         </div>
         <div aria-label="Credentials" role="region">
@@ -103,7 +124,10 @@ const jsonLd = breadcrumbJsonLd([
             ))}
           </ul>
           <p class="mt-8 text-ink-muted">NAICS 561730: Landscaping Services.</p>
-          <div class="mt-8"><Button href="/contact">Request a quote or the capability statement</Button></div>
+          <div class="mt-8">
+            <Button href="/contact">Request a quote</Button>
+            <p class="mt-4 text-[length:var(--step--1)] text-ink-muted">Need the capability statement? Ask for it in the request.</p>
+          </div>
         </div>
       </div>
     </Container>
