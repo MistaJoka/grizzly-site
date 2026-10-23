@@ -54,7 +54,9 @@ const { business } = siteConfig;
       <h2 class={`text-[length:var(--step--1)] font-semibold text-blade ${business.hours.length > 0 ? 'mt-6' : ''}`}>Company</h2>
       <ul class="mt-4 space-y-2">
         <li><a href={withBase('/commercial')} class="opacity-80 hover:opacity-100">Commercial &amp; HOA</a></li>
+        <li><a href={withBase('/work')} class="opacity-80 hover:opacity-100">Work</a></li>
         <li><a href={withBase('/about')} class="opacity-80 hover:opacity-100">About</a></li>
+        <li><a href={withBase('/contact')} class="opacity-80 hover:opacity-100">Contact</a></li>
         {siteConfig.social.map((link) => (
           <li><a href={link.href} rel="me noopener" class="opacity-80 hover:opacity-100">{link.label}</a></li>
         ))}

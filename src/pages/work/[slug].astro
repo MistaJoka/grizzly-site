@@ -27,6 +27,9 @@ if (!service) {
   throw new Error(`Project "${project.id}" references missing service "${project.data.service}".`);
 }
 
+// With no photos of its own yet, the project shows its service's image beside the scope.
+const stand = !before && !after ? await resolveImage(service.data.heroImage) : undefined;
+
 const url = canonical(`/work/${project.id}`, Astro.site);
 const jsonLd = breadcrumbJsonLd([
   { name: 'Home', url: canonical('/', Astro.site) },
@@ -67,15 +70,24 @@ const shared = { widths: [480, 800, 1400], sizes: '(min-width: 768px) 45vw, 90vw
     </section>
   )}
 
-  <section aria-label="Scope of work" class="bg-paper py-20">
-    <Container width="text">
-      <Eyebrow>Scope of work</Eyebrow>
-      <ul class="mt-8 divide-y divide-stone border-t border-stone">
-        {project.data.scope.map((item) => (
-          <li class="py-4 text-[length:var(--step-1)]">{item}</li>
-        ))}
-      </ul>
-      <div class="mt-12 text-ink-muted"><Content /></div>
+  <section aria-label="Scope of work" class="bg-paper py-20 md:py-28">
+    <Container>
+      <div class={`grid items-start gap-14 ${stand ? 'md:grid-cols-[5fr_6fr] md:gap-20' : ''}`}>
+        <div class={stand ? '' : 'max-w-[var(--container-text)]'}>
+          <Eyebrow>Scope of work</Eyebrow>
+          <ul class="mt-8 divide-y divide-stone border-t border-stone">
+            {project.data.scope.map((item) => (
+              <li class="py-5 text-[length:var(--step-2)] leading-snug">{item}</li>
+            ))}
+          </ul>
+          <div class="mt-10 max-w-[52ch] text-[length:var(--step-1)] text-ink-muted"><Content /></div>
+        </div>
+        {stand && (
+          <div class="grain relative overflow-hidden rounded-[var(--radius-media)] bg-stone shadow-[var(--shadow-panel)]">
+            <Image src={stand} alt={service.data.heroAlt} {...shared} class="aspect-[4/3] w-full object-cover" />
+          </div>
+        )}
+      </div>
     </Container>
   </section>
 

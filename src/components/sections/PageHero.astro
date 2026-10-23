@@ -15,21 +15,22 @@ const near = [palm(1300, Y + 6, 400, -18, { fronds: 10 }), palm(1440, Y + 6, 330
 let bushes = '';
 for (let x = 1000; x < W + 60; x += 80) bushes += shrub(x, Y + 2, 60 + 20 * Math.sin(x * 0.02));
 ---
-<section class="grain relative isolate overflow-hidden bg-sky">
+<!-- On phones the scene is a strip under the copy instead of a backdrop behind it. -->
+<section class="grain relative isolate overflow-hidden bg-sky" style={`background-image: linear-gradient(${PALETTE.skyTop}, ${PALETTE.skyLow})`}>
   <svg
     aria-hidden="true"
     focusable="false"
     viewBox={`0 0 ${W} ${H}`}
     preserveAspectRatio="xMaxYMax slice"
-    class="absolute inset-0 -z-10 h-full w-full"
+    class="absolute inset-x-0 bottom-0 -z-10 h-[17rem] w-full md:top-0 md:h-full"
   >
     <defs>
       <linearGradient id="page-sky" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0" stop-color={PALETTE.skyTop} /><stop offset="1" stop-color={PALETTE.skyLow} />
       </linearGradient>
     </defs>
-    <rect width={W} height={H} fill="url(#page-sky)" />
-    <g class="max-md:opacity-40">
+    <rect width={W} height={H} fill="url(#page-sky)" class="max-md:hidden" />
+    <g>
       <path d={bushes} fill={PALETTE.haze} />
       <path d={far} fill={PALETTE.hazePalm} />
       <path d={near} fill={PALETTE.mid} />
@@ -40,7 +41,7 @@ for (let x = 1000; x < W + 60; x += 80) bushes += shrub(x, Y + 2, 60 + 20 * Math
     <path d={dark} fill={PALETTE.lawnDark} />
   </svg>
 
-  <div class="mx-auto w-full max-w-[var(--container)] px-6 pb-[calc(var(--radius-sheet)+7rem)] pt-16 md:px-10 md:pb-[calc(var(--radius-sheet)+8rem)] md:pt-24">
+  <div class="mx-auto w-full max-w-[var(--container)] px-6 pb-[calc(var(--radius-sheet)+14rem)] pt-16 md:px-10 md:pb-[calc(var(--radius-sheet)+8rem)] md:pt-24">
     {eyebrow && <Eyebrow class="mb-5">{eyebrow}</Eyebrow>}
     <h1 class="max-w-[14ch] text-[clamp(2.6rem,1.6rem+3.6vw,4.6rem)] leading-[0.98]">{title}</h1>
     <slot name="meta" />
