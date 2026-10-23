@@ -1,13 +1,21 @@
 ---
 import Button from '../primitives/Button.astro';
+import { frond } from '../../lib/art.mjs';
 
 interface Props { headline: string; body: string }
 const { headline, body } = Astro.props;
+// Fronds lean in from both edges and frame the request.
+const left = frond(-80, 860, -48, 620, -30, { leaflets: 30, leafLen: 190, leafWidth: 13, spread: 52 });
+const right = frond(1680, -60, 150, 640, 140, { leaflets: 30, leafLen: 200, leafWidth: 13, spread: 52 });
 ---
-<section aria-label="Get started" class="bg-ink py-24 text-paper md:py-36">
-  <div class="mx-auto w-full max-w-[var(--container-text)] px-6 text-center md:px-10">
-    <h2 class="text-[length:var(--step-5)]">{headline}</h2>
-    <p class="mx-auto mt-6 max-w-[46ch] text-[length:var(--step-1)] opacity-75">{body}</p>
+<section aria-label="Get started" class="sheet z-[60] overflow-hidden bg-canopy py-28 text-paper md:py-40">
+  <svg aria-hidden="true" focusable="false" viewBox="0 0 1600 800" preserveAspectRatio="xMidYMid slice" class="pointer-events-none absolute inset-0 h-full w-full">
+    <path d={left} fill="var(--moss-deep)" />
+    <path d={right} fill="var(--canopy-deep)" />
+  </svg>
+  <div class="relative mx-auto w-full max-w-[var(--container-text)] px-6 text-center md:px-10">
+    <h2 class="text-[length:var(--step-6)] leading-[0.98]">{headline}</h2>
+    <p class="mx-auto mt-7 max-w-[42ch] text-[length:var(--step-1)] text-paper/80">{body}</p>
     <div class="mt-10 flex justify-center">
       <Button href="/contact">Request a quote</Button>
     </div>

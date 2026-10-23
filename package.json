@@ -14,6 +14,7 @@
     "test:e2e": "playwright test",
     "test": "npm run test:unit && npm run build && npm run test:e2e",
     "placeholders": "node scripts/generate-placeholders.mjs",
+    "icons": "node scripts/generate-icons.mjs",
     "prebuild": "node scripts/generate-placeholders.mjs",
     "test:perf": "lhci autorun",
     "predev": "node scripts/generate-placeholders.mjs",
@@ -21,7 +22,9 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
+    "@fontsource-variable/hanken-grotesk": "^5.3.0",
     "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource/gloock": "^5.3.0",
     "@fontsource/instrument-serif": "^5.3.0",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.3.1",

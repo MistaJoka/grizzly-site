@@ -51,13 +51,13 @@ describe('color tokens', () => {
 });
 
 describe('brand palette', () => {
-  it('uses the brown / forest green / cream scheme', () => {
-    // cream paper is light, forest green accent and bark brown are dark
+  it('uses the sage / St. Augustine green / mulch-brown scheme', () => {
+    // sage paper is light, the green accent and mulch brown are dark
     expect(luminance(token('paper'))).toBeGreaterThan(0.75);
     expect(luminance(token('moss'))).toBeLessThan(0.1);
     expect(luminance(token('bark'))).toBeLessThan(0.1);
   });
-  it('keeps paper text readable on the dark brown ink background', () => {
+  it('keeps paper text readable on the dark green ink background', () => {
     expect(contrast(token('paper'), token('ink'))).toBeGreaterThanOrEqual(7);
   });
 });

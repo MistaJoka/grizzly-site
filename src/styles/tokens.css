@@ -1,28 +1,46 @@
 :root {
-  --ink: #1F1812;
-  --ink-muted: #5B4F44;
-  --paper: #F6EFE2;
-  --paper-raised: #FFFAF0;
-  --moss: #2F4A33;
-  --moss-deep: #1F3324;
-  --stone: #D8CBB4;
-  --bark: #6B4528;
+  /* Miami yard palette: sage morning light, St. Augustine greens, bougainvillea. */
+  --ink: #13241C;
+  --ink-muted: #4A5B52;
+  --paper: #EDF1EC;
+  --paper-raised: #F8FAF6;
+  --moss: #1F5C3F;
+  --moss-deep: #164430;
+  --stone: #C9D4C8;
+  --bark: #5A3B26;
+  --canopy: #16392A;
+  --canopy-deep: #0F2A1F;
+  --blade: #7DB46A;
+  --blade-dark: #5F9A55;
+  --sky: #CFE5DD;
+  --haze: #F4E2CD;
+  --bloom: #B8336A;
+  --bloom-deep: #962656;
 
-  --font-display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
-  --font-body: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Gloock', 'Iowan Old Style', Georgia, serif;
+  --font-body: 'Hanken Grotesk Variable', 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
 
-  --measure: 68ch;
-  --container: 80rem;
+  --measure: 64ch;
+  --container: 82rem;
   --container-text: 42.5rem;
 
-  --step--1: clamp(0.83rem, 0.79rem + 0.20vw, 0.94rem);
-  --step-0:  clamp(1.00rem, 0.94rem + 0.30vw, 1.19rem);
-  --step-1:  clamp(1.20rem, 1.10rem + 0.50vw, 1.50rem);
-  --step-2:  clamp(1.44rem, 1.28rem + 0.80vw, 1.89rem);
-  --step-3:  clamp(1.73rem, 1.48rem + 1.25vw, 2.38rem);
-  --step-4:  clamp(2.07rem, 1.70rem + 1.87vw, 3.00rem);
-  --step-5:  clamp(2.49rem, 1.94rem + 2.75vw, 3.78rem);
-  --step-6:  clamp(2.99rem, 2.19rem + 3.98vw, 4.77rem);
+  --step--1: clamp(0.84rem, 0.80rem + 0.20vw, 0.95rem);
+  --step-0:  clamp(1.00rem, 0.95rem + 0.28vw, 1.15rem);
+  --step-1:  clamp(1.18rem, 1.08rem + 0.50vw, 1.45rem);
+  --step-2:  clamp(1.42rem, 1.26rem + 0.80vw, 1.90rem);
+  --step-3:  clamp(1.72rem, 1.46rem + 1.30vw, 2.50rem);
+  --step-4:  clamp(2.10rem, 1.70rem + 2.00vw, 3.30rem);
+  --step-5:  clamp(2.55rem, 1.90rem + 3.20vw, 4.40rem);
+  --step-6:  clamp(3.00rem, 2.00rem + 5.00vw, 6.00rem);
+  --step-7:  clamp(3.10rem, 1.80rem + 6.40vw, 7.40rem);
+
+  /* Radii by layer: a sheet holds panels, a panel holds media. */
+  --radius-sheet: clamp(1.75rem, 1rem + 3vw, 3rem);
+  --radius-media: 1.5rem;
+  --radius-panel: 1.1rem;
+
+  --shadow-sheet: 0 -1.5rem 3rem -2rem rgb(15 42 31 / 0.45);
+  --shadow-panel: 0 1.75rem 3.5rem -1.5rem rgb(15 42 31 / 0.35), 0 0.25rem 0.75rem rgb(15 42 31 / 0.08);
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --dur-fast: 180ms;

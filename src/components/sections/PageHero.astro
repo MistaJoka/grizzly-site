@@ -1,0 +1,49 @@
+---
+import Eyebrow from '../primitives/Eyebrow.astro';
+import { PALETTE, hedge, lawnStripes, palm, shrub } from '../../lib/art.mjs';
+
+interface Props { title: string; eyebrow?: string; lede?: string }
+const { title, eyebrow, lede } = Astro.props;
+
+// A shallow version of the home scene: hazy palms, one hedge line and a band of mowed lawn.
+const W = 1600;
+const H = 560;
+const Y = 470;
+const [light, dark] = lawnStripes(W, H, Y + 10, 1100, -200, 160);
+const far = [palm(1110, Y, 210, 8), palm(1185, Y, 250, -10), palm(1540, Y, 230, 6)].join('');
+const near = [palm(1300, Y + 6, 400, -18, { fronds: 10 }), palm(1440, Y + 6, 330, 24, { fronds: 9 })].join('');
+let bushes = '';
+for (let x = 1000; x < W + 60; x += 80) bushes += shrub(x, Y + 2, 60 + 20 * Math.sin(x * 0.02));
+---
+<section class="grain relative isolate overflow-hidden bg-sky">
+  <svg
+    aria-hidden="true"
+    focusable="false"
+    viewBox={`0 0 ${W} ${H}`}
+    preserveAspectRatio="xMaxYMax slice"
+    class="absolute inset-0 -z-10 h-full w-full"
+  >
+    <defs>
+      <linearGradient id="page-sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color={PALETTE.skyTop} /><stop offset="1" stop-color={PALETTE.skyLow} />
+      </linearGradient>
+    </defs>
+    <rect width={W} height={H} fill="url(#page-sky)" />
+    <g class="max-md:opacity-40">
+      <path d={bushes} fill={PALETTE.haze} />
+      <path d={far} fill={PALETTE.hazePalm} />
+      <path d={near} fill={PALETTE.mid} />
+    </g>
+    <path d={hedge(-20, Y - 24, W + 40, 40, 12)} fill={PALETTE.hedge} />
+    <rect y={Y + 10} width={W} height={H - Y} fill={PALETTE.lawnDark} />
+    <path d={light} fill={PALETTE.lawnLight} />
+    <path d={dark} fill={PALETTE.lawnDark} />
+  </svg>
+
+  <div class="mx-auto w-full max-w-[var(--container)] px-6 pb-[calc(var(--radius-sheet)+7rem)] pt-16 md:px-10 md:pb-[calc(var(--radius-sheet)+8rem)] md:pt-24">
+    {eyebrow && <Eyebrow class="mb-5">{eyebrow}</Eyebrow>}
+    <h1 class="max-w-[14ch] text-[clamp(2.6rem,1.6rem+3.6vw,4.6rem)] leading-[0.98]">{title}</h1>
+    <slot name="meta" />
+    {lede && <p class="mt-7 max-w-[46ch] text-[length:var(--step-1)] leading-snug text-ink-muted">{lede}</p>}
+  </div>
+</section>

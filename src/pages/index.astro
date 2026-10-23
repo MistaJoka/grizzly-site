@@ -4,14 +4,15 @@ import siteConfig, { credentialList } from '../../site.config';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BeforeAfter from '../components/sections/BeforeAfter.astro';
 import ClosingCTA from '../components/sections/ClosingCTA.astro';
+import { Image } from 'astro:assets';
 import Container from '../components/primitives/Container.astro';
-import Eyebrow from '../components/primitives/Eyebrow.astro';
 import Button from '../components/primitives/Button.astro';
 import Hero from '../components/sections/Hero.astro';
 import OfferingStrip from '../components/sections/OfferingStrip.astro';
 import ProcessSteps from '../components/sections/ProcessSteps.astro';
 import Proof from '../components/sections/Proof.astro';
 import ServiceAreaList from '../components/sections/ServiceAreaList.astro';
+import { resolveImage } from '../lib/images';
 
 const byOrder = <T extends { data: { order: number } }>(a: T, b: T) => a.data.order - b.data.order;
 
@@ -38,6 +39,8 @@ const areas = (await getCollection('areas')).sort(byOrder).map((area) => ({
 const testimonials = (await getCollection('testimonials')).sort(byOrder);
 const lead = testimonials[0];
 
+const commercialArt = await resolveImage('/images/services/tree-plant-installation.jpg');
+
 const steps = [
   { title: 'Send a request', body: 'Tell us what you need and where. A photo of the yard helps, but it is optional.' },
   { title: 'Get a quote from Alex', body: 'Alex reviews the request himself and sends you a price for the job.' },
@@ -47,9 +50,8 @@ const steps = [
 <BaseLayout transparentHeader>
   <Hero
     headline="Lawn care and tree installs across Miami-Dade."
-    lede="Grizzly Lawn Care is run by Alex Bermudez: lawn maintenance, bush and hedge trimming, mulching, pressure washing, and tree and plant installs for homes, HOAs and commercial properties."
-    imagePath="/images/hero.jpg"
-    imageAlt="A manicured South Florida lawn bordered by planting beds."
+    lede="Lawn maintenance, hedge trimming, mulching, pressure washing, and tree and plant installs for homes, HOAs and commercial properties."
+    note={`Owned and run by ${siteConfig.business.operator} since ${siteConfig.business.foundedYear}. Alex quotes every job and is on site for every one.`}
   />
   <OfferingStrip services={services} />
   {withPhotos && (
@@ -67,16 +69,30 @@ const steps = [
   )}
   <ProcessSteps steps={steps} />
 
-  <section aria-label="Commercial and HOA" class="bg-paper-raised py-20 md:py-32">
+  <section aria-label="Commercial and HOA" class="sheet z-30 bg-sky py-24 md:py-36">
     <Container>
-      <Eyebrow>Commercial &amp; HOA</Eyebrow>
-      <div class="mt-4 grid gap-10 md:grid-cols-[3fr_2fr] md:items-end">
-        <h2 class="max-w-[20ch] text-[length:var(--step-4)]">Larger jobs for contractors, HOAs and property managers.</h2>
+      <div class="grid items-center gap-14 md:grid-cols-[6fr_5fr] md:gap-16">
+        <!-- Layered composition: the illustration, with the job facts pinned over its corner. -->
+        <div class="relative md:order-2">
+          <Image
+            src={commercialArt}
+            alt="Illustration: a newly planted palm, staked, in front of a row of young trees."
+            widths={[480, 800, 1200]}
+            sizes="(min-width: 768px) 42vw, 90vw"
+            loading="lazy"
+            class="aspect-[4/5] w-full rounded-[var(--radius-media)] object-cover shadow-[var(--shadow-panel)]"
+          />
+          <div class="relative -mt-20 ml-6 mr-0 rounded-[var(--radius-panel)] bg-canopy p-6 text-paper shadow-[var(--shadow-panel)] md:absolute md:-bottom-10 md:-left-14 md:m-0 md:w-[19rem]">
+            <p class="font-[family-name:var(--font-display)] text-[length:var(--step-3)] leading-tight">40 trees, planted from 25-gallon containers.</p>
+            <p class="mt-2 text-[length:var(--step--1)] text-paper/75">A recent commercial installation.</p>
+          </div>
+        </div>
         <div>
-          <p class="text-[length:var(--step-1)] text-ink-muted">
-            Tree installs in 25-gallon containers, commercial grounds maintenance, and a recent 40-tree installation.
+          <h2 class="max-w-[14ch] text-[length:var(--step-5)]">Larger jobs for contractors, HOAs and property managers.</h2>
+          <p class="mt-6 max-w-[40ch] text-[length:var(--step-1)] text-ink-muted">
+            Tree installs in 25-gallon containers and commercial grounds maintenance, from an owner-operated company with one point of contact.
           </p>
-          <div class="mt-6"><Button href="/commercial" variant="ghost">See the capabilities</Button></div>
+          <div class="mt-9"><Button href="/commercial" variant="ghost">See the capabilities</Button></div>
         </div>
       </div>
     </Container>

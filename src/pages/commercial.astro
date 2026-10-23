@@ -1,10 +1,11 @@
 ---
 import { getCollection } from 'astro:content';
 import siteConfig, { credentialList } from '../../site.config';
-import { withBase } from '../lib/url';
 import PageLayout from '../layouts/PageLayout.astro';
 import Container from '../components/primitives/Container.astro';
 import Eyebrow from '../components/primitives/Eyebrow.astro';
+import { Image } from 'astro:assets';
+import { resolveImage } from '../lib/images';
 import Button from '../components/primitives/Button.astro';
 import ClosingCTA from '../components/sections/ClosingCTA.astro';
 import { breadcrumbJsonLd } from '../lib/schema';
@@ -23,6 +24,8 @@ const why = [
   'On time, clean job sites, careful around irrigation',
 ];
 
+const treeArt = await resolveImage('/images/services/tree-plant-installation.jpg');
+
 const jsonLd = breadcrumbJsonLd([
   { name: 'Home', url: canonical('/', Astro.site) },
   { name: 'Commercial', url: canonical('/commercial', Astro.site) },
@@ -35,13 +38,14 @@ const jsonLd = breadcrumbJsonLd([
   description="Grizzly Lawn Care capability statement: tree and plant installation, commercial grounds maintenance, and credentials for contractors, HOAs and property managers in Miami-Dade."
   jsonLd={jsonLd}
 >
-  <section aria-label="Capabilities" class="bg-paper-raised py-20">
+  <section aria-label="Capabilities" class="pb-20">
     <Container>
       <Eyebrow>What we do</Eyebrow>
-      <ul class="mt-10 grid gap-8 md:grid-cols-3">
+      <ul class="mt-10 grid gap-6 md:grid-cols-3">
         {capabilities.map((item) => (
-          <li class="reveal border-t border-stone pt-6">
-            <h2 class="text-[length:var(--step-2)]">{item.title}</h2>
+          <li class="reveal rounded-[var(--radius-panel)] bg-paper-raised p-7 shadow-[var(--shadow-panel)]">
+            <span aria-hidden="true" class="stripes block h-2 w-10 rounded-full"></span>
+            <h2 class="mt-6 text-[length:var(--step-2)] leading-tight">{item.title}</h2>
             <p class="mt-3 text-ink-muted">{item.body}</p>
           </li>
         ))}
@@ -50,35 +54,58 @@ const jsonLd = breadcrumbJsonLd([
   </section>
 
   {featured && (
-    <section aria-label="Featured project" class="bg-paper py-20">
-      <Container width="text">
-        <Eyebrow>Featured project</Eyebrow>
-        <h2 class="mt-4 text-[length:var(--step-3)]">{featured.data.title}</h2>
-        <ul class="mt-6 divide-y divide-stone border-t border-stone">
-          {featured.data.scope.map((item) => <li class="py-4 text-[length:var(--step-1)]">{item}</li>)}
-        </ul>
-        <p class="mt-6"><a href={withBase(`/work/${featured.id}`)} class="text-moss underline underline-offset-4">Project details</a></p>
+    <section aria-label="Featured project" class="sheet z-10 bg-sky py-24 md:py-32">
+      <Container>
+        <div class="grid items-center gap-14 md:grid-cols-[5fr_6fr] md:gap-20">
+          <div class="relative">
+            <Image
+              src={treeArt}
+              alt="Illustration: a newly planted palm, staked, in front of a row of young trees."
+              widths={[480, 800, 1200]}
+              sizes="(min-width: 768px) 40vw, 90vw"
+              loading="lazy"
+              class="aspect-[4/5] w-full rounded-[var(--radius-media)] object-cover shadow-[var(--shadow-panel)]"
+            />
+            <ul class="relative -mt-16 ml-6 space-y-2 rounded-[var(--radius-panel)] bg-canopy p-6 text-paper shadow-[var(--shadow-panel)] md:absolute md:-bottom-8 md:-right-10 md:m-0 md:w-[18rem]">
+              {featured.data.scope.map((item) => <li class="text-[length:var(--step-0)]">{item}</li>)}
+            </ul>
+          </div>
+          <div>
+            <Eyebrow>Featured project</Eyebrow>
+            <h2 class="mt-4 text-[length:var(--step-5)] leading-[1]">{featured.data.title}</h2>
+            <p class="mt-6 max-w-[40ch] text-[length:var(--step-1)] text-ink-muted">{featured.data.summary}</p>
+            <div class="mt-9"><Button href={`/work/${featured.id}`} variant="ghost">Project details</Button></div>
+          </div>
+        </div>
       </Container>
     </section>
   )}
 
-  <section aria-label="Why us" class="bg-paper-raised py-20">
-    <Container width="text">
-      <Eyebrow>Why us</Eyebrow>
-      <ul class="mt-8 divide-y divide-stone border-t border-stone">
-        {why.map((item) => <li class="py-4 text-[length:var(--step-1)]">{item}</li>)}
-      </ul>
-    </Container>
-  </section>
-
-  <section aria-label="Credentials" class="bg-paper py-20">
-    <Container width="text">
-      <Eyebrow>Credentials</Eyebrow>
-      <ul class="mt-8 divide-y divide-stone border-t border-stone">
-        {credentialList(siteConfig).map((item) => <li class="py-4 text-[length:var(--step-1)]">{item}</li>)}
-      </ul>
-      <p class="mt-6 text-ink-muted">NAICS 561730: Landscaping Services.</p>
-      <div class="mt-8"><Button href="/contact">Request a quote or the capability statement</Button></div>
+  <section aria-label="Why us" class="sheet z-20 bg-paper-raised py-24 md:py-32">
+    <Container>
+      <div class="grid gap-14 md:grid-cols-2 md:gap-20">
+        <div>
+          <h2 class="max-w-[14ch] text-[length:var(--step-4)]">Why contractors and managers call us.</h2>
+          <ul class="mt-10 divide-y divide-ink/10 border-y border-ink/10">
+            {why.map((item) => <li class="py-5 text-[length:var(--step-1)]">{item}</li>)}
+          </ul>
+        </div>
+        <div aria-label="Credentials" role="region">
+          <h2 class="max-w-[14ch] text-[length:var(--step-4)]">Credentials on file.</h2>
+          <ul class="relative mt-10">
+            {credentialList(siteConfig).map((item, index) => (
+              <li
+                class="relative -mt-3 rounded-[var(--radius-panel)] border border-ink/10 bg-paper px-7 pb-5 pt-7 text-[length:var(--step-1)] shadow-[var(--shadow-panel)] first:mt-0"
+                style={`z-index:${20 - index}; margin-inline:${index * 0.9}rem`}
+              >
+                {item}
+              </li>
+            ))}
+          </ul>
+          <p class="mt-8 text-ink-muted">NAICS 561730: Landscaping Services.</p>
+          <div class="mt-8"><Button href="/contact">Request a quote or the capability statement</Button></div>
+        </div>
+      </div>
     </Container>
   </section>
 

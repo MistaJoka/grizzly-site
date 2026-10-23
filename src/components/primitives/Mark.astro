@@ -1,0 +1,7 @@
+---
+import { mark } from '../../lib/art.mjs';
+
+interface Props { id: string; class?: string }
+const { id, class: className = '' } = Astro.props;
+---
+<span class={`block shrink-0 rounded-full ring-1 ring-ink/15 [&>svg]:h-full [&>svg]:w-full ${className}`} set:html={mark(id)} />

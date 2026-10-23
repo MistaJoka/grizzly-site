@@ -6,6 +6,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Container from '../../components/primitives/Container.astro';
 import Eyebrow from '../../components/primitives/Eyebrow.astro';
 import ClosingCTA from '../../components/sections/ClosingCTA.astro';
+import PageHero from '../../components/sections/PageHero.astro';
 import { breadcrumbJsonLd, serviceJsonLd } from '../../lib/schema';
 import { canonical } from '../../lib/seo';
 
@@ -36,12 +37,9 @@ const jsonLd = [
 ];
 ---
 <BaseLayout title={area.data.headline} description={area.data.summary} jsonLd={jsonLd}>
-  <Container class="pb-14 pt-20 md:pt-28">
-    <Eyebrow class="mb-5">Service area</Eyebrow>
-    <h1 class="max-w-[16ch] text-[length:var(--step-6)]">{area.data.headline}</h1>
-    <p class="mt-8 max-w-[var(--measure)] text-[length:var(--step-1)] text-ink-muted">{area.data.summary}</p>
-  </Container>
+  <PageHero title={area.data.headline} eyebrow="Service area" lede={area.data.summary} />
 
+  <div class="sheet z-10 overflow-hidden bg-paper-raised">
   <section aria-label="Local conditions" class="bg-paper-raised py-20">
     <Container width="text">
       <Eyebrow>What {area.data.town} properties need</Eyebrow>
@@ -54,7 +52,7 @@ const jsonLd = [
       <Eyebrow>What we do in {area.data.town}</Eyebrow>
       <ul class="mt-10 grid gap-8 md:grid-cols-3">
         {services.map((service) => (
-          <li class="reveal border-t border-stone pt-6">
+          <li class="reveal rounded-[var(--radius-panel)] bg-paper-raised p-7 shadow-[var(--shadow-panel)]">
             <h2 class="text-[length:var(--step-2)]">
               <a href={withBase(`/services/${service.id}`)} class="hover:text-moss">{service.data.title}</a>
             </h2>
@@ -70,7 +68,7 @@ const jsonLd = [
       <Eyebrow>Neighborhoods</Eyebrow>
       <ul class="mt-6 flex flex-wrap gap-3">
         {area.data.neighborhoods.map((neighborhood) => (
-          <li class="rounded-full border border-stone px-5 py-2 text-ink-muted">{neighborhood}</li>
+          <li class="rounded-full border border-ink/15 bg-paper px-5 py-2 text-ink-muted">{neighborhood}</li>
         ))}
       </ul>
     </Container>
@@ -80,4 +78,5 @@ const jsonLd = [
     headline={`Need work done in ${area.data.town}?`}
     body="Describe the job and send a photo if you can. Alex reviews every request and sends you a quote."
   />
+  </div>
 </BaseLayout>

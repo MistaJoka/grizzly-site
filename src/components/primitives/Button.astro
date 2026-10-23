@@ -1,12 +1,13 @@
 ---
 import { withBase } from '../../lib/url';
-interface Props { href: string; variant?: 'primary' | 'ghost'; class?: string }
+interface Props { href: string; variant?: 'primary' | 'ghost' | 'light'; class?: string }
 const { href, variant = 'primary', class: className = '' } = Astro.props;
 const base =
-  'inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-[length:var(--step-0)] font-medium transition-colors duration-[var(--dur-fast)] ease-[var(--ease-out)]';
+  'inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-[length:var(--step-0)] font-semibold tracking-[0.005em] transition-[background-color,border-color,transform] duration-[var(--dur-fast)] ease-[var(--ease-out)] active:translate-y-px';
 const variants = {
-  primary: 'bg-moss text-paper hover:bg-moss-deep',
-  ghost: 'border border-stone text-ink hover:border-ink',
+  primary: 'bg-bloom text-paper-raised shadow-[0_0.75rem_1.75rem_-0.75rem_var(--bloom)] hover:bg-bloom-deep',
+  ghost: 'border border-ink/25 text-ink hover:border-ink',
+  light: 'border border-paper/40 text-paper hover:border-paper',
 };
 ---
 <a href={withBase(href)} class={`${base} ${variants[variant]} ${className}`}><slot /></a>

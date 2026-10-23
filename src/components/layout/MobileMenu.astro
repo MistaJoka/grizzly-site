@@ -19,14 +19,15 @@ import siteConfig from '../../../site.config';
     aria-modal="true"
     aria-label="Site navigation"
     hidden
-    class="fixed inset-0 z-50 flex flex-col bg-paper px-6 py-6 text-ink"
+    class="fixed inset-0 z-50 flex flex-col overflow-hidden bg-canopy px-6 py-6 text-paper"
   >
     <div class="flex justify-end">
-      <button type="button" id="menu-close" class="rounded-full border border-ink px-5 py-2 text-[length:var(--step--1)]">
+      <button type="button" id="menu-close" class="rounded-full border border-paper/50 px-5 py-2 text-[length:var(--step--1)]">
         Close
       </button>
     </div>
-    <ul class="mt-16 flex flex-col gap-8">
+    <div aria-hidden="true" class="stripes absolute inset-x-0 bottom-0 h-28 opacity-25"></div>
+    <ul class="relative mt-16 flex flex-col gap-7">
       {siteConfig.nav.map((item) => (
         <li>
           <a href={withBase(item.href)} class="font-[family-name:var(--font-display)] text-[length:var(--step-4)]">{item.label}</a>
@@ -34,11 +35,11 @@ import siteConfig from '../../../site.config';
       ))}
     </ul>
     {siteConfig.business.phone && siteConfig.business.phoneHref ? (
-      <a href={siteConfig.business.phoneHref} class="mt-auto text-[length:var(--step-1)] text-moss">
+      <a href={siteConfig.business.phoneHref} class="relative mt-auto self-start rounded-full bg-bloom px-7 py-3.5 text-[length:var(--step-0)] font-semibold text-paper-raised">
         {siteConfig.business.phone}
       </a>
     ) : (
-      <a href={withBase('/contact')} class="mt-auto text-[length:var(--step-1)] text-moss">Request a quote</a>
+      <a href={withBase('/contact')} class="relative mt-auto self-start rounded-full bg-bloom px-7 py-3.5 text-[length:var(--step-0)] font-semibold text-paper-raised">Request a quote</a>
     )}
   </div>
 </div>

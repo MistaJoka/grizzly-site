@@ -21,8 +21,8 @@ const jsonLd = breadcrumbJsonLd([
   { name: 'Contact', url: canonical('/contact', Astro.site) },
 ]);
 
-const field = 'mt-2 w-full rounded-xl border border-stone bg-paper-raised px-4 py-3 text-[length:var(--step-0)] focus:border-moss';
-const label = 'block text-[length:var(--step--1)] font-medium';
+const field = 'mt-2 w-full rounded-xl border border-ink/15 bg-paper px-4 py-3 text-[length:var(--step-0)] transition-colors focus:border-moss focus:bg-paper-raised';
+const label = 'block text-[length:var(--step--1)] font-semibold';
 ---
 <PageLayout
   title="Request a quote."
@@ -34,7 +34,7 @@ const label = 'block text-[length:var(--step--1)] font-medium';
   <Container class="pb-24">
     <div class="grid gap-16 md:grid-cols-[3fr_2fr]">
       {action ? (
-        <div>
+        <div class="rounded-[var(--radius-media)] bg-paper-raised p-6 shadow-[var(--shadow-panel)] md:p-10">
           <!--
             Plain multipart form, no JavaScript. It posts to the hosted Groundwork route (/r/<slug>/send),
             which saves the request and redirects the browser to the hosted confirmation page.
@@ -103,7 +103,7 @@ const label = 'block text-[length:var(--step--1)] font-medium';
 
             <button
               type="submit"
-              class="rounded-full bg-moss px-8 py-4 text-[length:var(--step-0)] font-medium text-paper transition-colors duration-[var(--dur-fast)] hover:bg-moss-deep"
+              class="rounded-full bg-bloom px-8 py-4 text-[length:var(--step-0)] font-semibold text-paper-raised shadow-[0_0.75rem_1.75rem_-0.75rem_var(--bloom)] transition-colors duration-[var(--dur-fast)] hover:bg-bloom-deep"
             >
               Send request
             </button>
@@ -114,7 +114,8 @@ const label = 'block text-[length:var(--step--1)] font-medium';
           </form>
         </div>
       ) : (
-        <div data-testid="quote-unavailable" class="rounded-2xl border border-stone bg-paper-raised p-8">
+        <div data-testid="quote-unavailable" class="relative self-start overflow-hidden rounded-[var(--radius-media)] bg-paper-raised p-8 shadow-[var(--shadow-panel)] md:p-10">
+          <div aria-hidden="true" class="stripes absolute inset-x-0 top-0 h-2"></div>
           <h2 class="text-[length:var(--step-2)]">The online quote form is being set up.</h2>
           <p class="mt-4 text-ink-muted">
             {business.phone || business.email
@@ -146,7 +147,7 @@ const label = 'block text-[length:var(--step--1)] font-medium';
           <Eyebrow>Service area</Eyebrow>
           <ul class="mt-4 space-y-1">
             {areas.map((area) => (
-              <li><a href={withBase(`/areas/${area.id}`)} class="text-ink-muted hover:text-moss">{area.data.town}, {area.data.state}</a></li>
+              <li><a href={withBase(`/areas/${area.id}`)} class="text-ink-muted underline-offset-4 hover:text-moss hover:underline">{area.data.town}, {area.data.state}</a></li>
             ))}
           </ul>
         </div>

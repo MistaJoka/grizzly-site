@@ -1,38 +1,54 @@
 ---
-import { Image } from 'astro:assets';
 import siteConfig from '../../../site.config';
 import Button from '../primitives/Button.astro';
-import { resolveImage } from '../../lib/images';
+import { heroLayers } from '../../lib/art.mjs';
 
-interface Props { headline: string; lede: string; imagePath: string; imageAlt: string }
-const { headline, lede, imagePath, imageAlt } = Astro.props;
-const image = await resolveImage(imagePath);
+interface Props { headline: string; lede: string; note: string }
+const { headline, lede, note } = Astro.props;
+// Illustrated scene, drawn in code: sky, far palms, near palms and hedge, mowed lawn,
+// and fronds in the foreground. Each depth is its own layer so it can drift on scroll.
+const layers = heroLayers();
+const { business } = siteConfig;
+// Each word rises out of its own line box on load: the page's one entrance.
+const words = headline.split(' ');
 ---
-<section aria-label="Hero" class="relative flex min-h-[92svh] items-end overflow-hidden bg-ink">
-  <Image
-    src={image}
-    alt={imageAlt}
-    widths={[640, 1024, 1600, 2400]}
-    sizes="100vw"
-    loading="eager"
-    fetchpriority="high"
-    class="absolute inset-0 h-full w-full object-cover"
-  />
-  <div class="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/40 to-ink/25"></div>
+<section aria-label="Hero" class="grain relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-sky">
+  <div class="scene-layer scene-sky" set:html={layers.sky} />
+  <div class="scene-layer scene-far" set:html={layers.far} />
+  <div class="scene-layer scene-mid" set:html={layers.mid} />
+  <div class="scene-layer scene-lawn" set:html={layers.lawn} />
 
-  <div class="relative mx-auto w-full max-w-[var(--container)] px-6 pb-20 pt-40 text-paper md:px-10 md:pb-28">
-    <h1 class="max-w-[14ch] text-[length:var(--step-6)]">{headline}</h1>
-    <p class="mt-7 max-w-[46ch] text-[length:var(--step-1)] opacity-85">{lede}</p>
-    <div class="mt-10 flex flex-wrap items-center gap-4">
+  <div class="scene-copy relative z-10 mx-auto w-full max-w-[var(--container)] px-6 pt-28 md:px-10 md:pt-36">
+    <h1 class="max-w-[13ch] text-[clamp(2.9rem,1.7rem+4.2vw,5.3rem)] leading-[0.95] text-ink">
+      {words.map((word, i) => (
+        <><span class="rise"><span style={`--i:${i}`}>{word}</span></span>{i < words.length - 1 && ' '}</>
+      ))}
+    </h1>
+    <p class="mt-7 max-w-[40ch] text-[length:var(--step-1)] leading-snug text-ink-muted">{lede}</p>
+    <div class="mt-9 flex flex-wrap items-center gap-4">
       <Button href="/contact">Request a quote</Button>
-      {siteConfig.business.phone && siteConfig.business.phoneHref && (
-      <a
-        href={siteConfig.business.phoneHref}
-        class="rounded-full border border-paper/40 px-7 py-3.5 text-[length:var(--step-0)] transition-colors duration-[var(--dur-fast)] hover:border-paper"
-      >
-        {siteConfig.business.phone}
-      </a>
+      {business.phone && business.phoneHref ? (
+        <a
+          href={business.phoneHref}
+          class="rounded-full border border-ink/25 px-7 py-3.5 text-[length:var(--step-0)] font-semibold transition-colors duration-[var(--dur-fast)] hover:border-ink"
+        >
+          {business.phone}
+        </a>
+      ) : (
+        <Button href="/services" variant="ghost">See the services</Button>
       )}
     </div>
+  </div>
+
+  <!-- On phones the scene sits below the copy instead of behind it. -->
+  <div aria-hidden="true" class="h-[44svh] md:hidden"></div>
+
+  <div class="scene-layer scene-front z-20" set:html={layers.front} />
+
+  <!-- A frosted panel resting on the lawn: the one fact that sets this company apart. -->
+  <div class="relative z-30 mx-auto mt-auto w-full max-w-[var(--container)] px-6 pb-[calc(var(--radius-sheet)+2rem)] pt-0 md:px-10 md:pt-16">
+    <p class="max-w-[30rem] rounded-[var(--radius-panel)] border border-paper-raised/50 bg-paper-raised/70 px-6 py-5 text-[length:var(--step-0)] leading-snug text-ink shadow-[var(--shadow-panel)] backdrop-blur-md">
+      {note}
+    </p>
   </div>
 </section>

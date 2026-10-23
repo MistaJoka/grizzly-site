@@ -1,6 +1,5 @@
 ---
-import Container from '../components/primitives/Container.astro';
-import Eyebrow from '../components/primitives/Eyebrow.astro';
+import PageHero from '../components/sections/PageHero.astro';
 import BaseLayout from './BaseLayout.astro';
 
 interface Props {
@@ -15,10 +14,8 @@ interface Props {
 const { title, eyebrow, lede, description, ogImage, noindex, jsonLd } = Astro.props;
 ---
 <BaseLayout title={title} description={description} ogImage={ogImage} noindex={noindex} jsonLd={jsonLd}>
-  <Container class="pb-16 pt-20 md:pb-24 md:pt-32">
-    {eyebrow && <Eyebrow class="mb-5">{eyebrow}</Eyebrow>}
-    <h1 class="max-w-[16ch] text-[length:var(--step-6)]">{title}</h1>
-    {lede && <p class="mt-8 max-w-[var(--measure)] text-[length:var(--step-1)] text-ink-muted">{lede}</p>}
-  </Container>
-  <slot />
+  <PageHero title={title} eyebrow={eyebrow} lede={lede} />
+  <div class="sheet z-10 bg-paper pt-16 md:pt-24">
+    <slot />
+  </div>
 </BaseLayout>

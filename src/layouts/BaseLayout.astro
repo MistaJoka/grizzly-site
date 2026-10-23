@@ -11,8 +11,8 @@ import { localBusinessJsonLd } from '../lib/schema';
 // Both faces use font-display: swap, so without preloading them the fallback
 // paints first and the display headline reflows when the real font arrives —
 // measurable layout shift on a cold, CPU-throttled connection.
-import instrumentSerif from '@fontsource/instrument-serif/files/instrument-serif-latin-400-normal.woff2?url';
-import interVariable from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import gloock from '@fontsource/gloock/files/gloock-latin-400-normal.woff2?url';
+import hanken from '@fontsource-variable/hanken-grotesk/files/hanken-grotesk-latin-wght-normal.woff2?url';
 import '../styles/global.css';
 
 interface Props {
@@ -36,8 +36,12 @@ const schema = [localBusinessJsonLd(Astro.site), ...extra];
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="preload" as="font" type="font/woff2" href={instrumentSerif} crossorigin />
-    <link rel="preload" as="font" type="font/woff2" href={interVariable} crossorigin />
+    <meta name="theme-color" content="#16392A" />
+    <link rel="preload" as="font" type="font/woff2" href={gloock} crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href={hanken} crossorigin />
+    <link rel="icon" href={withBase("/favicon.svg")} type="image/svg+xml" />
+    <link rel="icon" href={withBase("/favicon-32.png")} type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href={withBase("/apple-touch-icon.png")} />
     <link rel="sitemap" href={withBase("/sitemap-index.xml")} />
     {holdBack && <meta name="robots" content="noindex, nofollow" />}
     <Meta title={title} description={description} ogImage={ogImage} noindex={noindex} />

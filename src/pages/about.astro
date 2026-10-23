@@ -23,33 +23,43 @@ const jsonLd = breadcrumbJsonLd([
   description={`${siteConfig.business.name} is a Miami landscaping company owned and run by ${siteConfig.business.operator}.`}
   jsonLd={jsonLd}
 >
-  <Container width="text" class="py-16 text-[length:var(--step-1)] text-ink-muted">
-    <p>
-      {siteConfig.business.legalName} is a Florida limited liability company based in Miami, formed in
-      {siteConfig.business.foundedYear}. It is owned and run by {siteConfig.business.operator}, who is on
-      every job, so there is one point of contact from the first message to the final cleanup.
-    </p>
-    <p class="mt-6">
-      The company has completed hundreds of residential jobs, mostly mowing, trimming, mulching, cleanup
-      and pressure washing, and has taken on larger work too, including a 40-tree installation with
-      25-gallon trees.
-    </p>
-    <p class="mt-6">
-      Customers can expect a business that shows up on time, takes care around sprinklers, pets and yard
-      objects, and cleans up after the work.
-    </p>
-  </Container>
+  <Container class="pb-24">
+    <div class="grid gap-14 md:grid-cols-[3fr_2fr] md:gap-20">
+      <div class="max-w-[var(--container-text)] text-[length:var(--step-1)] leading-relaxed text-ink-muted">
+        <p>
+          {siteConfig.business.legalName} is a Florida limited liability company based in Miami, formed in {siteConfig.business.foundedYear}.
+          It is owned and run by {siteConfig.business.operator}, who is on every job, so there is one point of contact from the
+          first message to the final cleanup.
+        </p>
+        <p class="mt-6">
+          The company has completed hundreds of residential jobs, mostly mowing, trimming, mulching, cleanup
+          and pressure washing, and has taken on larger work too, including a 40-tree installation with
+          25-gallon trees.
+        </p>
+        <p class="mt-6">
+          Customers can expect a business that shows up on time, takes care around sprinklers, pets and yard
+          objects, and cleans up after the work.
+        </p>
+      </div>
 
-  <section aria-label="Credentials" class="bg-paper-raised py-16">
-    <Container>
-      <Eyebrow>Credentials</Eyebrow>
-      <ul class="mt-8 divide-y divide-stone border-t border-stone">
-        {credentialList(siteConfig).map((credential) => (
-          <li class="py-5 text-[length:var(--step-1)]">{credential}</li>
-        ))}
-      </ul>
-    </Container>
-  </section>
+      <section aria-label="Credentials" class="self-start md:sticky md:top-28">
+        <div class="relative z-30 rounded-[var(--radius-panel)] bg-canopy px-7 py-7 text-paper shadow-[var(--shadow-panel)]">
+          <p class="font-[family-name:var(--font-display)] text-[length:var(--step-5)] leading-none">Since {siteConfig.business.foundedYear}</p>
+          <p class="mt-3 text-paper/75">{years} years in business in Miami-Dade</p>
+        </div>
+        <ul>
+          {credentialList(siteConfig).map((credential, index) => (
+            <li
+              class="relative -mt-3 rounded-[var(--radius-panel)] border border-ink/10 bg-paper-raised px-7 pb-5 pt-8 text-[length:var(--step-0)] shadow-[var(--shadow-panel)]"
+              style={`z-index:${20 - index}; margin-inline:${(index + 1) * 0.9}rem`}
+            >
+              {credential}
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
+  </Container>
 
   {testimonials.length > 0 && (
     <section aria-label="What clients say" class="bg-paper py-20">

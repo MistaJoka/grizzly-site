@@ -20,8 +20,17 @@ npm run test:e2e       # Playwright (desktop + mobile, incl. axe a11y); use: npx
 npm run test:perf      # Lighthouse CI against dist/ (set SITE_URL for the build first; SEO must be indexable)
 ```
 
-`npm run build` and `npm run dev` first generate flat brand-color placeholder images into
-`src/assets/images` (`scripts/generate-placeholders.mjs`). It never overwrites a file that already exists.
+`npm run build` and `npm run dev` first generate illustrated placeholder images (flat vector scenes, clearly not
+photos) into `src/assets/images` (`scripts/generate-placeholders.mjs`, drawn by `src/lib/art.mjs`). It never
+overwrites a file that already exists. To redraw one, delete it and run `npm run placeholders`.
+
+## Design
+
+Layered Miami yard: sage sky, St. Augustine greens, bougainvillea (`--bloom`) for actions, Gloock display and
+Hanken Grotesk text (tokens in `src/styles/tokens.css`). The home hero is an inline SVG scene in five depth layers
+(`heroLayers()` in `src/lib/art.mjs`) that drift at different speeds with a CSS scroll timeline; reduced motion
+turns that off. Sections are `.sheet`s that overlap the one before, and the mowed-lawn `.stripes` pattern is the
+one repeated motif. The hero stays illustrated even after real photos arrive; the service images get replaced.
 
 ## The quote form: how it works
 

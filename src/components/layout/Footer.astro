@@ -2,27 +2,30 @@
 import { withBase } from '../../lib/url';
 import { getCollection } from 'astro:content';
 import siteConfig from '../../../site.config';
+import Mark from '../primitives/Mark.astro';
 
 const areas = (await getCollection('areas')).sort((a, b) => a.data.order - b.data.order);
 const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
 const year = new Date().getFullYear();
 const { business } = siteConfig;
 ---
-<footer class="border-t border-stone bg-ink text-paper">
-  <div class="mx-auto grid w-full max-w-[var(--container)] gap-12 px-6 py-20 md:grid-cols-4 md:px-10">
+<footer class="sheet z-[70] overflow-hidden bg-canopy-deep text-paper">
+  <div aria-hidden="true" class="stripes h-3 opacity-80"></div>
+  <div class="mx-auto grid w-full max-w-[var(--container)] gap-12 px-6 py-20 md:grid-cols-[1.4fr_1fr_1fr_1fr] md:px-10">
     <div>
-      <p class="font-[family-name:var(--font-display)] text-[length:var(--step-2)]">{business.name}</p>
+      <Mark id="mark-footer" class="mb-5 h-12 w-12 ring-paper/20" />
+      <p class="font-[family-name:var(--font-display)] text-[length:var(--step-3)] leading-none">{business.name}</p>
       <p class="mt-4 opacity-70">{business.locality.city}, {business.locality.region}</p>
       <p class="opacity-70">Serving Miami-Dade County</p>
       {business.phone && business.phoneHref && <a href={business.phoneHref} class="mt-4 block hover:opacity-70">{business.phone}</a>}
       {business.email && <a href={`mailto:${business.email}`} class="block hover:opacity-70">{business.email}</a>}
       {!business.phone && !business.email && (
-        <a href={withBase('/contact')} class="mt-4 block hover:opacity-70">Request a quote</a>
+        <a href={withBase('/contact')} class="mt-6 inline-block rounded-full bg-bloom px-6 py-3 font-semibold text-paper-raised hover:bg-bloom-deep">Request a quote</a>
       )}
     </div>
 
     <div>
-      <h2 class="text-[length:var(--step--1)] uppercase tracking-[0.14em] opacity-60">Services</h2>
+      <h2 class="text-[length:var(--step--1)] font-semibold text-blade">Services</h2>
       <ul class="mt-4 space-y-2">
         {services.map((service) => (
           <li><a href={withBase(`/services/${service.id}`)} class="opacity-80 hover:opacity-100">{service.data.title}</a></li>
@@ -31,7 +34,7 @@ const { business } = siteConfig;
     </div>
 
     <div>
-      <h2 class="text-[length:var(--step--1)] uppercase tracking-[0.14em] opacity-60">Service area</h2>
+      <h2 class="text-[length:var(--step--1)] font-semibold text-blade">Service area</h2>
       <ul class="mt-4 space-y-2">
         {areas.map((area) => (
           <li><a href={withBase(`/areas/${area.id}`)} class="opacity-80 hover:opacity-100">{area.data.town}, {area.data.state}</a></li>
@@ -42,13 +45,13 @@ const { business } = siteConfig;
     <div>
       {business.hours.length > 0 && (
         <>
-          <h2 class="text-[length:var(--step--1)] uppercase tracking-[0.14em] opacity-60">Hours</h2>
+          <h2 class="text-[length:var(--step--1)] font-semibold text-blade">Hours</h2>
           <ul class="mt-4 space-y-2 opacity-80">
             {business.hours.map((line) => <li>{line}</li>)}
           </ul>
         </>
       )}
-      <h2 class={`text-[length:var(--step--1)] uppercase tracking-[0.14em] opacity-60 ${business.hours.length > 0 ? 'mt-6' : ''}`}>Company</h2>
+      <h2 class={`text-[length:var(--step--1)] font-semibold text-blade ${business.hours.length > 0 ? 'mt-6' : ''}`}>Company</h2>
       <ul class="mt-4 space-y-2">
         <li><a href={withBase('/commercial')} class="opacity-80 hover:opacity-100">Commercial &amp; HOA</a></li>
         <li><a href={withBase('/about')} class="opacity-80 hover:opacity-100">About</a></li>

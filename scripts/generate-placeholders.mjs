@@ -1,13 +1,14 @@
 import { access, mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import sharp from 'sharp';
+import { heroFlat, SERVICE_ART } from '../src/lib/art.mjs';
 
 const OUT = 'src/assets/images';
 export const OG_FILE = 'public/og/default.jpg';
-const PALETTE = ['#2F4A33', '#6B4528', '#1F3324', '#4A3520', '#3C5A40'];
 
-// Flat brand-color placeholders with NO text, so they are never mistaken for real photos.
-// Replace with Alex's own photos (same paths) before launch. See README "Alex must fill in".
+// Illustrated placeholders (flat vector scenes, clearly not photographs) drawn from
+// src/lib/art.mjs. Replace with Alex's own photos (same paths) before launch.
+// See README "Alex must fill in".
 export const FILES = [
   ['hero.jpg', 2400, 1600],
   ['services/lawn-maintenance.jpg', 1600, 1200],
@@ -17,38 +18,34 @@ export const FILES = [
   ['services/pressure-washing.jpg', 1600, 1200],
 ];
 
-function svg(width, height, color) {
-  return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
-    <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="${color}"/><stop offset="1" stop-color="#1F1812"/>
-    </linearGradient></defs>
-    <rect width="100%" height="100%" fill="url(#g)"/>
-  </svg>`);
+function svg(name, width, height) {
+  const slug = name.replace(/^services\//, '').replace(/\.jpg$/, '');
+  const draw = SERVICE_ART[slug];
+  // Service scenes are drawn in their own viewBox, so pin the raster size on them.
+  const markup = draw
+    ? draw(width, height).replace('<svg ', `<svg width="${width}" height="${height}" `)
+    : heroFlat(width, height);
+  return Buffer.from(markup);
 }
 
 const exists = (path) => access(path).then(() => true, () => false);
 
 async function generate() {
-let index = 0;
 for (const [name, width, height] of FILES) {
   const target = join(OUT, name);
   // Never overwrite a real photo that has been dropped in at this path.
-  if (await exists(target)) { index += 1; continue; }
+  if (await exists(target)) continue;
   await mkdir(dirname(target), { recursive: true });
-  const buffer = await sharp(svg(width, height, PALETTE[index % PALETTE.length]))
-    .jpeg({ quality: 82 })
-    .toBuffer();
-  await writeFile(target, buffer);
-  index += 1;
+  await writeFile(target, await sharp(svg(name, width, height)).jpeg({ quality: 86 }).toBuffer());
 }
 
 // Open Graph default lives in public/ because social crawlers need a stable, unhashed URL.
 await mkdir('public/og', { recursive: true });
 if (!(await exists(OG_FILE))) {
-  await writeFile(OG_FILE, await sharp(svg(1200, 630, PALETTE[0])).jpeg({ quality: 82 }).toBuffer());
+  await writeFile(OG_FILE, await sharp(svg('og.jpg', 1200, 630)).jpeg({ quality: 86 }).toBuffer());
 }
 
-console.log(`generated ${FILES.length + 1} placeholder images`);
+console.log(`placeholder images ready (${FILES.length + 1})`);
 }
 
 // Only generate when invoked directly, so tests can import the manifest.

@@ -7,29 +7,39 @@ interface Props {
 }
 const { testimonial, credentials, yearsInBusiness } = Astro.props;
 ---
-<section aria-label="Why us" class="bg-moss py-20 text-paper md:py-32">
-  <div class={`mx-auto grid w-full max-w-[var(--container)] gap-14 px-6 md:px-10 ${testimonial ? 'md:grid-cols-[3fr_2fr]' : ''}`}>
+<section aria-label="Why us" class="sheet z-40 bg-paper py-24 md:py-36">
+  <div class="mx-auto grid w-full max-w-[var(--container)] gap-14 px-6 md:grid-cols-[5fr_6fr] md:items-center md:px-10">
     {testimonial ? (
       <figure>
-        <blockquote class="font-[family-name:var(--font-display)] text-[length:var(--step-4)] leading-[1.15]">
+        <blockquote class="font-[family-name:var(--font-display)] text-[length:var(--step-4)] leading-[1.12]">
           &ldquo;{testimonial.quote}&rdquo;
         </blockquote>
-        <figcaption class="mt-8 text-[length:var(--step-0)] opacity-80">
+        <figcaption class="mt-8 text-[length:var(--step-0)] text-ink-muted">
           {testimonial.attribution}, {testimonial.town}
         </figcaption>
       </figure>
     ) : (
-      <h2 class="max-w-[18ch] font-[family-name:var(--font-display)] text-[length:var(--step-4)] leading-[1.15]">
-        One owner, one point of contact.
-      </h2>
+      <div>
+        <h2 class="max-w-[13ch] text-[length:var(--step-5)]">One owner, one point of contact.</h2>
+        <p class="mt-6 max-w-[38ch] text-[length:var(--step-1)] text-ink-muted">
+          The person who quotes your job is the person who shows up to do it.
+        </p>
+      </div>
     )}
 
-    <ul class="space-y-5 self-center">
-      <li class="border-t border-paper/25 pt-4 text-[length:var(--step-1)]">
-        {yearsInBusiness} years in business in Miami-Dade
+    <!-- Stacked cards, each tucked slightly under the one above. -->
+    <ul class="relative">
+      <li class="relative z-30 rounded-[var(--radius-panel)] bg-moss px-7 py-6 text-paper shadow-[var(--shadow-panel)]">
+        <span class="block font-[family-name:var(--font-display)] text-[length:var(--step-5)] leading-none">{yearsInBusiness} years</span>
+        <span class="mt-2 block text-paper/80">in business in Miami-Dade</span>
       </li>
-      {credentials.map((credential) => (
-        <li class="border-t border-paper/25 pt-4 text-[length:var(--step-1)]">{credential}</li>
+      {credentials.map((credential, index) => (
+        <li
+          class="relative -mt-3 rounded-[var(--radius-panel)] border border-ink/10 bg-paper-raised px-7 pb-5 pt-8 text-[length:var(--step-1)] shadow-[var(--shadow-panel)]"
+          style={`z-index:${20 - index}; margin-left:${(index + 1) * 0.9}rem; margin-right:${(index + 1) * 0.9}rem`}
+        >
+          {credential}
+        </li>
       ))}
     </ul>
   </div>
