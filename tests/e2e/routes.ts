@@ -19,5 +19,6 @@ export const ROUTES = [
   '/areas/kendall',
   '/about',
   '/contact',
+  '/preview',
   '/404',
 ] as const;

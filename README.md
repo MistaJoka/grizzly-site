@@ -75,6 +75,10 @@ Fonts and layout are unchanged from the template. Pages: Home, Services (5) + de
 
 ## Alex must fill in
 
+`/preview` is a private walkthrough for Alex (search result, shared link, phone, business profile, and this list,
+read live from `site.config.ts`). It is noindex, not in the nav or sitemap. **Delete `src/pages/preview.astro` at launch**
+(and drop `/preview` from `tests/e2e/routes.ts`).
+
 All of these are empty in `site.config.ts` (or are env vars) and are hidden from visitors until supplied:
 
 - [ ] Phone number (`business.phone`, `business.phoneHref`)

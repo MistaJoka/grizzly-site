@@ -1,0 +1,207 @@
+---
+// A private walkthrough for Alex while the site is a demo: how the business would look
+// wherever customers meet it. Not in the nav or the sitemap, always noindex.
+// Delete this page when the site goes live on its own domain.
+import { getCollection } from 'astro:content';
+import siteConfig, { missingConfig } from '../../site.config';
+import PageLayout from '../layouts/PageLayout.astro';
+import Container from '../components/primitives/Container.astro';
+import Eyebrow from '../components/primitives/Eyebrow.astro';
+import Button from '../components/primitives/Button.astro';
+import Mark from '../components/primitives/Mark.astro';
+import { withBase } from '../lib/url';
+
+const { business, seo } = siteConfig;
+const services = await getCollection('services');
+const areas = (await getCollection('areas')).sort((a, b) => a.data.order - b.data.order);
+
+const domain = siteConfig.site.url ? new URL(siteConfig.site.url).host : '';
+const missing = missingConfig(siteConfig);
+const lacks = (prefix: string) => missing.some((key) => key.startsWith(prefix));
+
+const ready = [
+  `${services.length} service pages, one for each kind of work`,
+  `${areas.length} town pages: ${areas.map((area) => area.data.town).join(', ')}`,
+  'A Commercial & HOA page for property managers and contractors',
+  'The Grizzly palm mark, used as the logo and the phone icon',
+  'Works on phones, tablets and computers',
+  'Hidden from search engines until you say it is ready',
+];
+
+const needs = [
+  { label: 'Photos of your work', body: 'Lawns, hedges, the 40-tree job. Phone photos are fine. They replace the drawings.', show: true },
+  { label: 'Your business phone number', body: 'Shown on every page with a tap-to-call button.', show: lacks('business.phone') },
+  { label: 'A public email', body: 'For customers who would rather write.', show: lacks('business.email') },
+  { label: 'Your hours', body: 'The days and times you take calls or work.', show: lacks('business.hours') },
+  { label: 'Insurance and licenses', body: 'Only the ones you want shown, in your own wording.', show: lacks('business.credentials') },
+  { label: 'A domain name', body: 'The address the site lives at. We can pick one together.', show: lacks('site.url') },
+  { label: 'Your profile links', body: 'Google Business Profile, Facebook or Instagram, if you have them.', show: lacks('social') },
+  { label: 'Reviews from customers', body: 'Only real ones, with the customer’s OK to show them.', show: true },
+  { label: 'A quick read-through', body: 'Check the services, the towns and the wording sound like you.', show: true },
+].filter((item) => item.show);
+
+const sitelinks = [
+  { label: 'Services', href: '/services' },
+  { label: 'Commercial & HOA', href: '/commercial' },
+  { label: 'Work', href: '/work' },
+  { label: 'Contact', href: '/contact' },
+];
+
+const panel = 'relative rounded-[var(--radius-media)] bg-paper-raised shadow-[var(--shadow-panel)]';
+const blank = 'rounded-md border border-dashed border-ink/30 px-2 text-ink-muted';
+---
+<PageLayout
+  title="Alex, here’s how Grizzly looks online."
+  eyebrow="A preview for Alex"
+  lede="Your website as it stands today, and the places customers would find it. Nothing here is public yet."
+  description="A private preview of the Grizzly Lawn Care website for Alex Bermudez."
+  noindex
+>
+  <Container class="pb-24">
+    <!-- Search -->
+    <section aria-labelledby="search-h" class="grid items-center gap-10 md:grid-cols-[2fr_3fr] md:gap-16">
+      <div>
+        <Eyebrow>Searching</Eyebrow>
+        <h2 id="search-h" class="mt-4 text-[length:var(--step-4)]">When someone looks for lawn care.</h2>
+        <p class="mt-5 max-w-[46ch] text-[length:var(--step-1)] text-ink-muted">
+          Each page is written so search engines know what you do and where. Once the site is switched on,
+          a search can show your name, what you do, and links straight to your pages.
+        </p>
+      </div>
+      <div class={`${panel} p-5 sm:p-8`} role="group" aria-label="Example search result for Grizzly Lawn Care">
+        <div class="flex items-center gap-3 rounded-full border border-ink/15 bg-paper px-5 py-3 text-ink-muted">
+          <svg aria-hidden="true" viewBox="0 0 24 24" class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+          <span>lawn care Miami</span>
+        </div>
+        <div class="mt-7">
+          <div class="flex items-center gap-3">
+            <Mark id="mark-search" class="h-8 w-8" />
+            <div class="min-w-0 leading-tight">
+              <p class="text-[length:var(--step--1)] font-semibold">{business.name}</p>
+              <p class="truncate text-[length:var(--step--1)] text-ink-muted">
+                {domain ? `https://${domain}` : <span class={blank}>your domain</span>}
+              </p>
+            </div>
+          </div>
+          <p class="mt-3 text-[length:var(--step-1)] leading-snug text-moss">{seo.defaultTitle}</p>
+          <p class="mt-2 line-clamp-2 text-[length:var(--step--1)] text-ink-muted">{seo.defaultDescription}</p>
+          <ul class="mt-4 flex flex-wrap gap-2">
+            {sitelinks.map((link) => (
+              <li><a href={withBase(link.href)} class="block rounded-full border border-ink/15 px-4 py-1.5 text-[length:var(--step--1)] text-moss transition-colors hover:border-moss">{link.label}</a></li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Phone -->
+    <section aria-labelledby="phone-h" class="mt-28 grid items-center gap-12 md:mt-36 md:grid-cols-[3fr_2fr] md:gap-16">
+      <div>
+        <Eyebrow>On their phone</Eyebrow>
+        <h2 id="phone-h" class="mt-4 text-[length:var(--step-4)]">Most customers will see it here.</h2>
+        <p class="mt-5 max-w-[46ch] text-[length:var(--step-1)] text-ink-muted">
+          That is the real site in the frame. Scroll it. Saved to a home screen, it shows up as the Grizzly palm.
+        </p>
+      </div>
+      <div class="relative mx-auto flex items-end gap-6 sm:gap-10 md:order-first">
+        <div class="relative h-[600px] w-[300px] shrink-0 overflow-hidden rounded-[2.6rem] border-[10px] border-canopy-deep bg-canopy-deep shadow-[var(--shadow-panel)]">
+          <iframe
+            src={withBase('/')}
+            title="The Grizzly Lawn Care home page on a phone"
+            loading="lazy"
+            class="h-[748px] w-[374px] origin-top-left scale-[0.7486] rounded-[2rem] bg-paper"
+          ></iframe>
+        </div>
+        <div class="hidden flex-col items-center gap-2 sm:flex" aria-hidden="true">
+          <img src={withBase('/apple-touch-icon.png')} alt="" width="76" height="76" class="h-[76px] w-[76px] rounded-[1.1rem] shadow-[var(--shadow-panel)]" />
+          <span class="text-[length:var(--step--1)] font-semibold">Grizzly</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Shared link and profile -->
+    <section aria-labelledby="share-h" class="mt-28 md:mt-36">
+      <div class="max-w-[52ch]">
+        <Eyebrow>Passed along</Eyebrow>
+        <h2 id="share-h" class="mt-4 text-[length:var(--step-4)]">When a neighbor sends your link.</h2>
+        <p class="mt-5 text-[length:var(--step-1)] text-ink-muted">
+          Lots of yard work comes from word of mouth. A shared link opens as a card with your picture and name,
+          and a free business profile puts your phone and hours right in the search results.
+        </p>
+      </div>
+
+      <div class="mt-12 grid gap-10 md:grid-cols-2 md:gap-12">
+        <div class={`${panel} grain overflow-hidden bg-sky p-6 sm:p-8`} role="img" aria-label="Example text message sharing the Grizzly Lawn Care site">
+          <p class="ml-auto w-fit max-w-[80%] rounded-2xl rounded-br-md bg-moss px-4 py-2.5 text-paper">Here’s the lawn guy I told you about</p>
+          <div class="ml-auto mt-2 w-[85%] overflow-hidden rounded-2xl rounded-br-md bg-paper-raised shadow-[var(--shadow-panel)]">
+            <img src={withBase(seo.ogImage)} alt="" width="1200" height="630" class="aspect-[1200/630] w-full object-cover" />
+            <div class="px-4 py-3">
+              <p class="font-semibold leading-snug">{seo.defaultTitle}</p>
+              <p class="mt-1 text-[length:var(--step--1)] text-ink-muted">{domain || 'your domain'}</p>
+            </div>
+          </div>
+          <p class="mt-6 w-fit max-w-[80%] rounded-2xl rounded-bl-md bg-paper-raised px-4 py-2.5">Thanks, I’ll send him a request</p>
+        </div>
+
+        <div class={`${panel} overflow-hidden`} role="img" aria-label="Example business profile for Grizzly Lawn Care">
+          <div class="stripes h-24"></div>
+          <div class="px-6 pb-7 sm:px-8">
+            <Mark id="mark-profile" class="-mt-9 h-[4.5rem] w-[4.5rem] ring-4 ring-paper-raised" />
+            <p class="mt-4 font-[family-name:var(--font-display)] text-[length:var(--step-3)] leading-none">{business.name}</p>
+            <p class="mt-2 text-ink-muted">Landscaper in {business.locality.city}, {business.locality.region}</p>
+            <div class="mt-5 flex flex-wrap gap-2">
+              {['Website', 'Call', 'Save'].map((action) => (
+                <span class="rounded-full bg-canopy px-4 py-1.5 text-[length:var(--step--1)] font-semibold text-paper">{action}</span>
+              ))}
+            </div>
+            <dl class="mt-6 space-y-3 border-t border-ink/10 pt-5 text-[length:var(--step--1)]">
+              <div class="flex gap-4"><dt class="w-20 shrink-0 font-semibold">Serves</dt><dd>{areas.map((area) => area.data.town).join(', ')}</dd></div>
+              <div class="flex gap-4"><dt class="w-20 shrink-0 font-semibold">Phone</dt><dd>{business.phone || <span class={blank}>your phone number</span>}</dd></div>
+              <div class="flex gap-4"><dt class="w-20 shrink-0 font-semibold">Hours</dt><dd>{business.hours.length ? business.hours.join(', ') : <span class={blank}>your hours</span>}</dd></div>
+              <div class="flex gap-4"><dt class="w-20 shrink-0 font-semibold">Website</dt><dd>{domain || <span class={blank}>your domain</span>}</dd></div>
+            </dl>
+          </div>
+        </div>
+      </div>
+      <p class="mt-6 text-[length:var(--step--1)] text-ink-muted">The dashed spots fill in as soon as you send that information.</p>
+    </section>
+  </Container>
+
+  <!-- Checklist -->
+  <section aria-labelledby="list-h" class="sheet z-20 bg-canopy pb-24 pt-20 text-paper md:pb-32 md:pt-28">
+    <Container>
+      <h2 id="list-h" class="max-w-[20ch] text-[length:var(--step-5)]">What’s done, and what we need from you.</h2>
+      <div class="mt-14 grid gap-12 md:grid-cols-2 md:gap-16">
+        <div>
+          <p class="font-[family-name:var(--font-display)] text-[length:var(--step-3)]">Ready now</p>
+          <ul class="mt-6 space-y-4">
+            {ready.map((item) => (
+              <li class="flex gap-4">
+                <span aria-hidden="true" class="stripes mt-2 h-2.5 w-7 shrink-0 rounded-full"></span>
+                <span class="text-paper/85">{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div class="rounded-[var(--radius-media)] bg-paper-raised p-7 text-ink shadow-[var(--shadow-panel)] sm:p-9">
+          <p class="font-[family-name:var(--font-display)] text-[length:var(--step-3)]">From you, Alex</p>
+          <ul class="mt-6 space-y-5">
+            {needs.map((item) => (
+              <li class="flex gap-4">
+                <span aria-hidden="true" class="mt-1 h-5 w-5 shrink-0 rounded-md border-2 border-moss"></span>
+                <div>
+                  <p class="font-semibold">{item.label}</p>
+                  <p class="text-[length:var(--step--1)] text-ink-muted">{item.body}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      <div class="mt-16 flex flex-wrap items-center gap-4">
+        <Button href="/" variant="primary">Open the full site</Button>
+        <Button href="/services" variant="light">See the services</Button>
+      </div>
+    </Container>
+  </section>
+</PageLayout>

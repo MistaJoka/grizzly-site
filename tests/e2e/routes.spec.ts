@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { ROUTES } from './routes';
 
 test('the manifest covers every expected page', () => {
-  expect(ROUTES).toHaveLength(19);
+  expect(ROUTES).toHaveLength(20);
 });
 
 for (const route of ROUTES) {
