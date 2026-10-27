@@ -6,7 +6,7 @@ import Container from '../components/primitives/Container.astro';
 import { breadcrumbJsonLd } from '../lib/schema';
 import { canonical } from '../lib/seo';
 import { withBase } from '../lib/url';
-import { GROUNDWORK_FIELDS as F, GROUNDWORK_LIMITS as L, quoteActionUrl, quotePageUrl } from '../lib/quote';
+import { GROUNDWORK_FIELDS as F, GROUNDWORK_LIMITS as L, HEARD_VIA, quoteActionUrl, quotePageUrl, smsHref } from '../lib/quote';
 
 const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
 const areas = (await getCollection('areas')).sort((a, b) => a.data.order - b.data.order);
@@ -14,6 +14,7 @@ const areas = (await getCollection('areas')).sort((a, b) => a.data.order - b.dat
 const action = quoteActionUrl(siteConfig.quote.groundworkQuoteUrl);
 const hostedPage = quotePageUrl(siteConfig.quote.groundworkQuoteUrl);
 const { business } = siteConfig;
+const textHref = smsHref(business.phoneHref);
 
 const next = [
   { title: 'Alex reads your request', body: 'Every request goes to the owner, with any photos you attach.' },
@@ -96,6 +97,14 @@ const label = 'block text-[length:var(--step--1)] font-semibold';
             </div>
 
             <div>
+              <label class={label} for="heard_via">How did you hear about us? (optional)</label>
+              <select class={field} id="heard_via" name={F.heardVia}>
+                <option value="">Choose one</option>
+                {HEARD_VIA.map(([value, text]) => <option value={value}>{text}</option>)}
+              </select>
+            </div>
+
+            <div>
               <label class={label} for="photos">Photos (optional, up to {L.maxPhotos}, {L.maxPhotoMb} MB each)</label>
               <input class={`${field} file:mr-4 file:cursor-pointer file:rounded-full file:border-0 file:bg-canopy file:px-5 file:py-2 file:font-semibold file:text-paper hover:file:bg-moss`} id="photos" name={F.photos} type="file" multiple accept="image/jpeg,image/png,image/webp" />
             </div>
@@ -139,6 +148,9 @@ const label = 'block text-[length:var(--step--1)] font-semibold';
               <h2 class="text-[length:var(--step--1)] font-semibold text-blade">Call or email</h2>
               {business.phone && business.phoneHref && (
                 <a href={business.phoneHref} class="mt-3 block font-[family-name:var(--font-display)] text-[length:var(--step-3)] leading-none hover:text-blade">{business.phone}</a>
+              )}
+              {business.phone && textHref && (
+                <a href={textHref} data-testid="text-link" class="mt-3 inline-block rounded-full border border-paper/30 px-5 py-2 font-semibold hover:border-paper">Text Alex</a>
               )}
               {business.email && <a href={`mailto:${business.email}`} class="mt-2 block text-paper/80 hover:text-paper">{business.email}</a>}
               {business.hours.length > 0 && (

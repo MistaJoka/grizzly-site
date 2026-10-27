@@ -2,6 +2,7 @@
 import siteConfig from '../../../site.config';
 import Button from '../primitives/Button.astro';
 import { heroLayers } from '../../lib/art.mjs';
+import { smsHref } from '../../lib/quote';
 
 interface Props { headline: string; lede: string; note: string }
 const { headline, lede, note } = Astro.props;
@@ -9,6 +10,7 @@ const { headline, lede, note } = Astro.props;
 // and fronds in the foreground. Each depth is its own layer so it can drift on scroll.
 const layers = heroLayers();
 const { business } = siteConfig;
+const textHref = smsHref(business.phoneHref);
 // Each word rises out of its own line box on load: the page's one entrance.
 const words = headline.split(' ');
 ---
@@ -36,6 +38,14 @@ const words = headline.split(' ');
         </a>
       ) : (
         <Button href="/services" variant="ghost">See the services</Button>
+      )}
+      {business.phone && textHref && (
+        <a
+          href={textHref}
+          class="rounded-full border border-ink/25 px-7 py-3.5 text-[length:var(--step-0)] font-semibold transition-colors duration-[var(--dur-fast)] hover:border-ink"
+        >
+          Text
+        </a>
       )}
     </div>
   </div>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { GROUNDWORK_FIELDS, GROUNDWORK_LIMITS, quoteActionUrl, quotePageUrl } from '../../src/lib/quote';
+import { GROUNDWORK_FIELDS, GROUNDWORK_LIMITS, HEARD_VIA, quoteActionUrl, quotePageUrl, smsHref } from '../../src/lib/quote';
 
 describe('quote URL handling', () => {
   it('returns empty when unconfigured or invalid', () => {
@@ -24,5 +24,22 @@ describe('Groundwork contract', () => {
   });
   it('mirrors its documented limits', () => {
     expect(GROUNDWORK_LIMITS).toEqual({ maxPhotos: 3, maxPhotoMb: 5, ratePerHour: 5 });
+  });
+});
+
+describe('smsHref', () => {
+  it('turns a tel: link into an sms: link', () => {
+    expect(smsHref('tel:+13055550100')).toBe('sms:+13055550100');
+  });
+  it('is empty for a missing or odd link', () => {
+    expect(smsHref('')).toBe('');
+    expect(smsHref('mailto:a@b.co')).toBe('');
+  });
+});
+
+describe('HEARD_VIA', () => {
+  it('only offers values Groundwork keeps', () => {
+    const groundwork = ['google', 'social', 'nextdoor', 'website', 'sign', 'referral', 'other'];
+    expect(HEARD_VIA.map(([value]) => value)).toEqual(groundwork);
   });
 });
