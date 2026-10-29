@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages (not enabled until you add the repo variables)
+name: Deploy to GitHub Pages
 
 on:
   push:
@@ -29,6 +29,8 @@ jobs:
           # Repository variables (Settings > Secrets and variables > Actions > Variables).
           # SITE_URL unset => the build stays noindex / robots-blocked.
           SITE_URL: ${{ vars.SITE_URL }}
+          # HOLD_BACK=1 => real URLs but still noindex (staging). Delete the variable to go live.
+          HOLD_BACK: ${{ vars.HOLD_BACK }}
           GROUNDWORK_QUOTE_URL: ${{ vars.GROUNDWORK_QUOTE_URL }}
           # Only needed for a github.io project page; leave unset with a custom domain.
           BASE_PATH: ${{ vars.BASE_PATH }}

@@ -44,8 +44,12 @@ describe('unknown values are empty placeholders, not invented', () => {
   });
 
   it('treats the site as not live until a URL is configured', () => {
-    expect(isLive({ ...siteConfig, site: { url: '', basePath: '' } })).toBe(false);
-    expect(isLive({ ...siteConfig, site: { url: 'https://example.com', basePath: '' } })).toBe(true);
+    expect(isLive({ ...siteConfig, site: { url: '', basePath: '', holdBack: '' } })).toBe(false);
+    expect(isLive({ ...siteConfig, site: { url: 'https://example.com', basePath: '', holdBack: '' } })).toBe(true);
+  });
+
+  it('keeps a staging build with HOLD_BACK set out of search even with a real URL', () => {
+    expect(isLive({ ...siteConfig, site: { url: 'https://example.com', basePath: '', holdBack: '1' } })).toBe(false);
   });
 });
 

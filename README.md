@@ -58,14 +58,24 @@ Verified from the Groundwork source and by Playwright (request intercepted, fiel
 **Not yet tested against a live Groundwork deployment**, since none is hosted. Test one real submission after
 deploying.
 
-## Deploy (not done yet)
+## Deploy
 
-No GitHub repo exists and nothing has been pushed or deployed.
+Live on **GitHub Pages** at <https://grizzlysite.andraewilliams.com> (staging while the site is being worked on).
+Every push to `main` runs `.github/workflows/pages.yml`, which builds `dist/` and publishes it. Repository variables
+(Settings > Secrets and variables > Actions > Variables) drive the build:
 
-- **GitHub Pages**: `.github/workflows/pages.yml` is ready. Create the repo, enable Pages (source: GitHub Actions),
-  add repository variables `SITE_URL`, `GROUNDWORK_QUOTE_URL` and (only for a `github.io/<repo>` URL) `BASE_PATH=/<repo>`.
-- **Vercel**: import the repo, framework preset Astro, add env vars `SITE_URL` and `GROUNDWORK_QUOTE_URL`. No adapter needed.
-- Until `SITE_URL` is set, the build serves `robots.txt: Disallow: /` and `noindex` on every page, so a placeholder build cannot be indexed.
+| Variable | Now | Meaning |
+|---|---|---|
+| `SITE_URL` | `https://grizzlysite.andraewilliams.com` | Canonical, OG and sitemap URLs. Unset => noindex + `robots.txt: Disallow: /`. |
+| `HOLD_BACK` | `1` | Staging switch: real URLs but still noindex + Disallow. **Delete it to go live.** |
+| `GROUNDWORK_QUOTE_URL` | unset | Hosted Groundwork `/r/<slug>` page; unset => contact page shows no form. |
+| `BASE_PATH` | unset | Only for a `github.io/<repo>` URL. Must stay unset on the custom domain. |
+
+DNS: `grizzlysite` is a CNAME at GoDaddy (andraewilliams.com's DNS) pointing at `mistajoka.github.io`; the custom
+domain is set in the repo's Pages settings, so no `CNAME` file is needed in the build.
+
+Moving to Alex's own domain later: change the DNS CNAME and the Pages custom domain, set `SITE_URL` to it, delete
+`HOLD_BACK`. (**Vercel** also works: import the repo, framework preset Astro, same env vars. No adapter needed.)
 
 ## Design
 

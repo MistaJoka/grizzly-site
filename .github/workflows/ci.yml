@@ -8,6 +8,10 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    env:
+      # CI verifies the indexable build: Lighthouse's SEO budget (minScore 1) needs robots.txt to allow
+      # crawling, which only a configured SITE_URL does. Deployment sets its own values in pages.yml.
+      SITE_URL: https://grizzlysite.andraewilliams.com
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

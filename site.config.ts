@@ -44,6 +44,12 @@ export interface SiteConfig {
     url: string;
     /** Optional sub-path for GitHub Pages project sites, e.g. '/grizzly-site'. Env: BASE_PATH */
     basePath: string;
+    /**
+     * Staging switch. Set HOLD_BACK=1 on a build that has a real SITE_URL (so canonical, OG and sitemap
+     * URLs are correct) but must still stay out of search: robots.txt Disallow + noindex on every page.
+     * Delete the variable to go live. Env: HOLD_BACK
+     */
+    holdBack: string;
   };
   quote: {
     /**
@@ -89,6 +95,7 @@ const siteConfig: SiteConfig = {
   site: {
     url: env('SITE_URL'), // TODO(Alex): set the real domain
     basePath: env('BASE_PATH'),
+    holdBack: env('HOLD_BACK'),
   },
   quote: {
     groundworkQuoteUrl: env('GROUNDWORK_QUOTE_URL'), // TODO: hosted /r/<slug> URL
@@ -135,6 +142,7 @@ export function credentialList(config: SiteConfig = siteConfig): string[] {
   ];
 }
 
+/** Indexable: a real URL is configured and the staging hold-back is off. */
 export function isLive(config: SiteConfig = siteConfig): boolean {
-  return config.site.url.length > 0;
+  return config.site.url.length > 0 && !config.site.holdBack;
 }
