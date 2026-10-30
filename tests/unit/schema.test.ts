@@ -57,7 +57,37 @@ describe('localBusinessJsonLd (values filled in)', () => {
   });
 });
 
+describe('localBusinessJsonLd offer catalog', () => {
+  const cfg = configWith(() => {});
+  it('lists each service as an offered Service with its URL', () => {
+    const data = localBusinessJsonLd(site, cfg, SERVED_AREAS, [
+      { name: 'Lawn Mowing & Maintenance', url: 'https://grizzly.example.test/services/lawn-maintenance' },
+    ]) as Record<string, any>;
+    expect(data.hasOfferCatalog['@type']).toBe('OfferCatalog');
+    const offer = data.hasOfferCatalog.itemListElement[0];
+    expect(offer['@type']).toBe('Offer');
+    expect(offer.itemOffered['@type']).toBe('Service');
+    expect(offer.itemOffered.name).toBe('Lawn Mowing & Maintenance');
+    expect(offer.itemOffered.url).toBe('https://grizzly.example.test/services/lawn-maintenance');
+  });
+  it('omits the catalog when no services are passed', () => {
+    expect(localBusinessJsonLd(site, cfg)).not.toHaveProperty('hasOfferCatalog');
+  });
+});
+
 describe('serviceJsonLd', () => {
+  it('links the provider to the business node by @id when the site is known', () => {
+    const data = serviceJsonLd({
+      name: 'Pressure Washing',
+      description: 'Washing walkways.',
+      url: 'https://grizzly.example.test/services/pressure-washing',
+      areaServed: ['Miami'],
+      site,
+    }) as Record<string, any>;
+    expect(data.provider['@id']).toBe('https://grizzly.example.test/#business');
+    expect(data.provider.name).toBe('Grizzly Lawn Care');
+  });
+
   it('builds a Service node with a provider reference', () => {
     const data = serviceJsonLd({
       name: 'Pressure Washing',

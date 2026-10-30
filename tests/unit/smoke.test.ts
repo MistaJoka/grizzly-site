@@ -15,4 +15,18 @@ describe('project scaffold', () => {
       expect(pkg.scripts).toHaveProperty(script);
     }
   });
+
+  it('emits search-engine verification tags only when a token is configured', () => {
+    const meta = readFileSync('src/components/seo/Meta.astro', 'utf-8');
+    expect(meta).toMatch(/verification\.google && <meta name="google-site-verification"/);
+    expect(meta).toMatch(/verification\.bing && <meta name="msvalidate\.01"/);
+  });
+
+  it('forwards every site.config env() key through the Pages deploy workflow', () => {
+    const config = readFileSync('site.config.ts', 'utf-8');
+    const keys = [...config.matchAll(/env\('([A-Z_]+)'\)/g)].map((m) => m[1]);
+    expect(keys.length).toBeGreaterThan(3);
+    const pages = readFileSync('.github/workflows/pages.yml', 'utf-8');
+    for (const key of keys) expect(pages, key).toContain(`${key}: \${{ vars.${key} }}`);
+  });
 });

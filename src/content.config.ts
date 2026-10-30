@@ -1,6 +1,6 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
-import { areaSchema, projectSchema, serviceSchema, testimonialSchema } from './lib/schemas';
+import { areaSchema, localSchema, projectSchema, serviceSchema, testimonialSchema } from './lib/schemas';
 
 export const collections = {
   services: defineCollection({
@@ -14,6 +14,10 @@ export const collections = {
   projects: defineCollection({
     loader: glob({ pattern: '**/*.md', base: './src/content/projects' }),
     schema: projectSchema,
+  }),
+  local: defineCollection({
+    loader: glob({ pattern: '**/*.md', base: './src/content/local' }),
+    schema: localSchema,
   }),
   testimonials: defineCollection({
     loader: glob({ pattern: '**/*.md', base: './src/content/testimonials' }),

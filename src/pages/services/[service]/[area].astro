@@ -1,0 +1,125 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Container from '../../../components/primitives/Container.astro';
+import Eyebrow from '../../../components/primitives/Eyebrow.astro';
+import ClosingCTA from '../../../components/sections/ClosingCTA.astro';
+import PageHero from '../../../components/sections/PageHero.astro';
+import { breadcrumbJsonLd, faqJsonLd, serviceJsonLd } from '../../../lib/schema';
+import { canonical, localTitle } from '../../../lib/seo';
+import { withBase } from '../../../lib/url';
+
+// One page per hand-written `src/content/local/<service>--<area>.md`. Nothing is generated from a
+// template: if the content file does not exist, neither does the page.
+export const getStaticPaths: GetStaticPaths = async () => {
+  const [entries, services, areas] = await Promise.all([
+    getCollection('local'),
+    getCollection('services'),
+    getCollection('areas'),
+  ]);
+  return entries.map((entry) => {
+    const service = services.find((s) => s.id === entry.data.service);
+    const area = areas.find((a) => a.id === entry.data.area);
+    if (!service || !area) {
+      throw new Error(`local/${entry.id}: unknown service "${entry.data.service}" or area "${entry.data.area}"`);
+    }
+    return { params: { service: service.id, area: area.id }, props: { entry, service, area } };
+  });
+};
+
+const { entry, service, area } = Astro.props;
+const { Content } = await render(entry);
+const { town, state } = area.data;
+const url = canonical(`/services/${service.id}/${area.id}`, Astro.site);
+const title = entry.data.seoTitle ?? localTitle(service.data.title, town, state);
+const description = entry.data.seoDescription ?? entry.data.summary;
+
+// Other service-in-town pages written for this same town.
+const siblings = (await getCollection('local'))
+  .filter((other) => other.data.area === area.id && other.id !== entry.id)
+  .map((other) => ({ entry: other, title: other.data.headline, href: `/services/${other.data.service}/${other.data.area}` }));
+
+const jsonLd = [
+  serviceJsonLd({ name: title, description, url, areaServed: [town], site: Astro.site }),
+  faqJsonLd(entry.data.faqs),
+  breadcrumbJsonLd([
+    { name: 'Home', url: canonical('/', Astro.site) },
+    { name: 'Services', url: canonical('/services', Astro.site) },
+    { name: service.data.title, url: canonical(`/services/${service.id}`, Astro.site) },
+    { name: town, url },
+  ]),
+];
+---
+<BaseLayout title={title} description={description} jsonLd={jsonLd}>
+  <PageHero title={entry.data.headline} eyebrow={`${service.data.title} · ${town}, ${state}`} lede={entry.data.summary}>
+    <nav slot="meta" aria-label="Breadcrumb" class="mt-5 text-[length:var(--step--1)] text-ink-muted">
+      <ol class="flex flex-wrap items-center gap-2">
+        <li><a href={withBase('/')} class="underline-offset-4 hover:underline">Home</a></li>
+        <li aria-hidden="true">/</li>
+        <li><a href={withBase('/services')} class="underline-offset-4 hover:underline">Services</a></li>
+        <li aria-hidden="true">/</li>
+        <li><a href={withBase(`/services/${service.id}`)} class="underline-offset-4 hover:underline">{service.data.title}</a></li>
+        <li aria-hidden="true">/</li>
+        <li aria-current="page" class="text-ink">{town}</li>
+      </ol>
+    </nav>
+  </PageHero>
+
+  <div class="sheet z-10 overflow-hidden bg-paper-raised">
+  <section aria-label="Local conditions" class="bg-paper-raised py-20 md:py-24">
+    <Container>
+      <Eyebrow>{service.data.title} in {town}</Eyebrow>
+      <p class="mt-6 max-w-[64ch] text-[length:var(--step-1)] leading-relaxed">{entry.data.localNote}</p>
+    </Container>
+  </section>
+
+  <Container width="text" class="py-16 text-[length:var(--step-1)] text-ink-muted">
+    <Content />
+  </Container>
+
+  <section aria-label="Common questions" class="bg-paper py-20 md:py-28">
+    <Container width="text">
+      <Eyebrow>Common questions in {town}</Eyebrow>
+      <dl class="mt-10 divide-y divide-stone border-t border-stone">
+        {entry.data.faqs.map((faq) => (
+          <div class="py-7">
+            <dt class="font-[family-name:var(--font-display)] text-[length:var(--step-2)]">{faq.question}</dt>
+            <dd class="mt-3 text-ink-muted">{faq.answer}</dd>
+          </div>
+        ))}
+      </dl>
+    </Container>
+  </section>
+
+  <section aria-label="Related pages" class="bg-paper-raised py-16">
+    <Container>
+      <Eyebrow>More on this</Eyebrow>
+      <ul class="mt-6 flex flex-wrap gap-3">
+        <li>
+          <a href={withBase(`/services/${service.id}`)} class="block rounded-full border border-ink/20 bg-paper-raised px-5 py-2 transition-colors hover:border-ink">
+            {service.data.title} across Miami-Dade
+          </a>
+        </li>
+        <li>
+          <a href={withBase(`/areas/${area.id}`)} class="block rounded-full border border-ink/20 bg-paper-raised px-5 py-2 transition-colors hover:border-ink">
+            Everything we do in {town}
+          </a>
+        </li>
+        {siblings.map((sibling) => (
+          <li>
+            <a href={withBase(sibling.href)} class="block rounded-full border border-ink/20 bg-paper-raised px-5 py-2 transition-colors hover:border-ink">
+              {sibling.title}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </Container>
+  </section>
+
+  <ClosingCTA
+    headline={`${service.data.title} in ${town}?`}
+    body="Describe the property and send a photo if you can. Alex reviews every request and sends you a quote."
+  />
+  </div>
+</BaseLayout>

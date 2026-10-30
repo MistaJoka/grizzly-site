@@ -21,6 +21,7 @@ describe('content inventory', () => {
     expect(ids('src/content/services')).toHaveLength(5);
     expect(ids('src/content/areas')).toHaveLength(6);
     expect(ids('src/content/projects')).toHaveLength(1);
+    expect(ids('src/content/local').length).toBeGreaterThanOrEqual(6);
   });
 
   it('ships no testimonials: only real, permissioned ones may be added later', () => {
@@ -73,5 +74,54 @@ describe('area pages are not templated duplicates', () => {
     });
     for (const note of notes) expect(note.length).toBeGreaterThanOrEqual(200);
     expect(new Set(notes).size).toBe(notes.length);
+  });
+});
+
+describe('local (service-in-town) pages are gated on real content', () => {
+  const localIds = ids('src/content/local');
+  const serviceIds = ids('src/content/services');
+  const areaIds = ids('src/content/areas');
+
+  it('names every file <service>--<area> with both ids real', () => {
+    for (const id of localIds) {
+      const [service, area, extra] = id.split('--');
+      expect(extra, id).toBeUndefined();
+      expect(serviceIds, id).toContain(service);
+      expect(areaIds, id).toContain(area);
+      const fm = frontmatter(`src/content/local/${id}.md`);
+      expect(fm.service, id).toBe(service);
+      expect(fm.area, id).toBe(area);
+    }
+  });
+
+  it('only pairs a service with an area that lists that service', () => {
+    for (const id of localIds) {
+      const [service, area] = id.split('--');
+      const raw = readFileSync(`src/content/areas/${area}.md`, 'utf-8');
+      const listed = [...(raw.split('\nservices:\n')[1] ?? '').matchAll(/^  - ([a-z-]+)$/gm)].map((m) => m[1]);
+      expect(listed, id).toContain(service);
+    }
+  });
+
+  it('covers every area at least once (more pages per town may be added without code changes)', () => {
+    const covered = new Set(localIds.map((id) => id.split('--')[1]));
+    for (const area of areaIds) expect([...covered], area).toContain(area);
+  });
+
+  it('gives every local page a distinct localNote of at least 300 characters', () => {
+    const notes = localIds.map((id) => {
+      const raw = readFileSync(`src/content/local/${id}.md`, 'utf-8');
+      const m = raw.match(/localNote: >-\n([\s\S]*?)\n\w+:/);
+      if (!m) throw new Error(`no localNote in ${id}`);
+      return m[1].replace(/\s+/g, ' ').trim();
+    });
+    for (const note of notes) expect(note.length).toBeGreaterThanOrEqual(300);
+    expect(new Set(notes).size).toBe(notes.length);
+  });
+
+  it('has no prices, ratings, review numbers or "crew" language in local content (owner-operated)', () => {
+    for (const id of localIds) {
+      expect(readFileSync(`src/content/local/${id}.md`, 'utf-8'), id).not.toMatch(/\$\d|\b4\.8\d?\b|\b\d+ reviews\b|LawnStarter|\bcrews?\b/i);
+    }
   });
 });

@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { ROUTES } from './routes';
 
 test('the manifest covers every expected page', () => {
-  expect(ROUTES).toHaveLength(20);
+  expect(ROUTES).toHaveLength(26);
 });
 
 for (const route of ROUTES) {
@@ -23,8 +23,8 @@ for (const route of ROUTES) {
   });
 }
 
-test('robots.txt points at the sitemap (site URL is configured for e2e)', async ({ request }) => {
+test('robots.txt points at the sitemap (site URL is configured for e2e)', async ({ request, baseURL }) => {
   const body = await (await request.get('/robots.txt')).text();
-  expect(body).toContain('Sitemap: http://localhost:4321/sitemap-index.xml');
+  expect(body).toContain(`Sitemap: ${baseURL}/sitemap-index.xml`);
   expect(body).not.toContain('Disallow: /\n');
 });

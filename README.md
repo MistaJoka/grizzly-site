@@ -15,7 +15,8 @@ npm install
 npm run dev            # http://localhost:4321
 npm run check:config   # lists what Alex still has to fill in
 npm run test:unit      # Vitest
-npm run build          # static site in dist/
+npm run build          # static site in dist/ (one .html per route: build.format 'file')
+npm run test:seo       # audits dist/: titles, descriptions, canonicals, JSON-LD graph, links, sitemap, robots (needs SITE_URL)
 npm run test:e2e       # Playwright (desktop + mobile, incl. axe a11y); use: npx playwright test --workers=1
 npm run test:perf      # Lighthouse CI against dist/ (set SITE_URL for the build first; SEO must be indexable)
 ```
@@ -82,6 +83,25 @@ Moving to Alex's own domain later: change the DNS CNAME and the Pages custom dom
 Brand palette (tokens in `src/styles/tokens.css`): deep bark brown ink, forest green accent, cream paper.
 Fonts and layout are unchanged from the template. Pages: Home, Services (5) + detail, Commercial & HOA
 (capability statement), Work (+ detail), About, Contact, Areas (6), 404.
+
+## SEO engine
+
+Built 2026-10-29 so the site is ready to rank the day it launches on Alex's domain. See `docs/seo-launch.md`
+for the launch order and `docs/superpowers/specs/2026-10-29-seo-engine-design.md` for the reasoning.
+
+- **Service-in-town pages** at `/services/<service>/<area>`, built only from a hand-written
+  `src/content/local/<service>--<area>.md` (300+ characters of real local text, 2+ FAQs). Six are seeded, one per
+  town. Service pages link each town to its local page when one exists, area pages link each service likewise.
+- **One schema graph:** the `LandscapingBusiness` node carries an `@id` and an `OfferCatalog` of the services;
+  every `Service` node points its `provider` at that `@id`; FAQ and BreadcrumbList where the page shows them.
+- **Title rules** in `src/lib/seo.ts`: `serviceTitle`, `areaTitle`, `localTitle`, bounded by `TITLE_MAX`;
+  `seoTitle` / `seoDescription` frontmatter overrides on services, areas and local pages.
+- **Verification tokens** from `GOOGLE_SITE_VERIFICATION` / `BING_SITE_VERIFICATION` env vars.
+- **Audit** (`npm run test:seo`, `tests/seo/`) runs in CI on the indexable build and on a `HOLD_BACK=1` build:
+  one h1, title 20-65, description 70-160, canonical = `SITE_URL` + route, og:url, unique titles and
+  descriptions, JSON-LD parses and links, internal hrefs resolve, alt text, sitemap = indexable pages, robots and
+  `noindex` agree with the build.
+- **Staging stays hidden:** `HOLD_BACK=1` keeps `noindex` + `Disallow: /` while URLs are already final-form.
 
 ## Alex must fill in
 

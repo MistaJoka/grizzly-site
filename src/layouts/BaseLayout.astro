@@ -7,7 +7,9 @@ import SkipLink from '../components/layout/SkipLink.astro';
 import JsonLd from '../components/seo/JsonLd.astro';
 import Meta from '../components/seo/Meta.astro';
 import siteConfig, { isLive } from '../../site.config';
-import { localBusinessJsonLd } from '../lib/schema';
+import { localBusinessJsonLd, SERVED_AREAS } from '../lib/schema';
+import { canonical } from '../lib/seo';
+import { getCollection } from 'astro:content';
 // Both faces use font-display: swap, so without preloading them the fallback
 // paints first and the display headline reflows when the real font arrives —
 // measurable layout shift on a cold, CPU-throttled connection.
@@ -29,7 +31,10 @@ const { title, description, ogImage, noindex, transparentHeader = false, jsonLd 
 const holdBack = !isLive(siteConfig);
 
 const extra = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
-const schema = [localBusinessJsonLd(Astro.site), ...extra];
+const offered = (await getCollection('services'))
+  .sort((a, b) => a.data.order - b.data.order)
+  .map((service) => ({ name: service.data.title, url: canonical(`/services/${service.id}`, Astro.site) }));
+const schema = [localBusinessJsonLd(Astro.site, siteConfig, SERVED_AREAS, offered), ...extra];
 ---
 <!doctype html>
 <html lang="en">

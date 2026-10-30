@@ -32,6 +32,9 @@ jobs:
           # HOLD_BACK=1 => real URLs but still noindex (staging). Delete the variable to go live.
           HOLD_BACK: ${{ vars.HOLD_BACK }}
           GROUNDWORK_QUOTE_URL: ${{ vars.GROUNDWORK_QUOTE_URL }}
+          # Search Console / Bing ownership tokens (HTML-tag method). Unset => no tag.
+          GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}
+          BING_SITE_VERIFICATION: ${{ vars.BING_SITE_VERIFICATION }}
           # Only needed for a github.io project page; leave unset with a custom domain.
           BASE_PATH: ${{ vars.BASE_PATH }}
       - uses: actions/configure-pages@v5

@@ -1,5 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
 
+// E2E_PORT lets a run sidestep a stale `astro dev` left on 4321 (reuseExistingServer would
+// otherwise test against whatever that old server has in its environment).
+const port = Number(process.env.E2E_PORT ?? 4321);
+const origin = `http://localhost:${port}`;
+
 export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: true,
@@ -7,7 +12,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   reporter: 'list',
   use: {
-    baseURL: 'http://localhost:4321',
+    baseURL: origin,
     trace: 'on-first-retry',
   },
   projects: [
@@ -15,8 +20,8 @@ export default defineConfig({
     { name: 'mobile', use: { ...devices['Pixel 7'] } },
   ],
   webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:4321',
+    command: `npm run dev -- --port ${port}`,
+    url: origin,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
     // Astro 7 auto-detects agentic shells (e.g. Claude Code, via the
@@ -32,7 +37,7 @@ export default defineConfig({
       PLAYWRIGHT: '1',
       // Fake values so e2e exercises the configured state. No request is ever sent to these hosts.
       GROUNDWORK_QUOTE_URL: 'https://quotes.example.test/r/grizzly-test',
-      SITE_URL: 'http://localhost:4321',
+      SITE_URL: origin,
     },
   },
 });

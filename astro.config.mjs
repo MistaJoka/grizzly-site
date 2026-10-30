@@ -13,6 +13,10 @@ export default defineConfig({
   site: siteUrl || 'http://localhost:4321',
   base: basePath || undefined,
   output: 'static',
+  // One .html file per route (/services -> dist/services.html). GitHub Pages serves /services from it
+  // directly, so the canonical, the sitemap entry and the URL visitors land on are the same string;
+  // the default directory format made every extensionless link a 301 to its trailing-slash twin.
+  build: { format: 'file' },
   // /preview is a private walkthrough for Alex, never listed.
   integrations: [sitemap({ filter: (page) => !page.includes('/preview') })],
   // The dev toolbar injects its own UI (including a button labelled "Menu") that would collide
