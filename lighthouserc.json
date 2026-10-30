@@ -4,11 +4,11 @@
       "staticDistDir": "./dist",
       "url": [
         "http://localhost/index.html",
-        "http://localhost/services/index.html",
-        "http://localhost/services/tree-plant-installation/index.html",
-        "http://localhost/areas/miami/index.html",
-        "http://localhost/commercial/index.html",
-        "http://localhost/contact/index.html"
+        "http://localhost/services.html",
+        "http://localhost/services/tree-plant-installation.html",
+        "http://localhost/areas/miami.html",
+        "http://localhost/commercial.html",
+        "http://localhost/contact.html"
       ],
       "numberOfRuns": 3,
       "settings": { "preset": "desktop" }

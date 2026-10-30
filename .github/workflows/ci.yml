@@ -26,7 +26,11 @@ jobs:
         run: npm run test:unit
       - name: Build
         run: npm run build
+      - name: SEO audit (indexable build)
+        run: npm run test:seo
       - name: End-to-end tests
         run: npm run test:e2e
       - name: Performance budget
         run: npm run test:perf
+      - name: SEO audit (held-back build, as deployed to staging)
+        run: HOLD_BACK=1 npm run build && HOLD_BACK=1 npm run test:seo

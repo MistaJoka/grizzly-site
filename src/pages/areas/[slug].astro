@@ -9,7 +9,7 @@ import ClosingCTA from '../../components/sections/ClosingCTA.astro';
 import PageHero from '../../components/sections/PageHero.astro';
 import { gridSpans } from '../../lib/grid';
 import { breadcrumbJsonLd, serviceJsonLd } from '../../lib/schema';
-import { canonical } from '../../lib/seo';
+import { areaTitle, canonical } from '../../lib/seo';
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const areas = await getCollection('areas');
@@ -46,7 +46,7 @@ const jsonLd = [
   ]),
 ];
 ---
-<BaseLayout title={area.data.headline} description={area.data.summary} jsonLd={jsonLd}>
+<BaseLayout title={area.data.seoTitle ?? areaTitle(area.data.town, area.data.state)} description={area.data.seoDescription ?? area.data.summary} jsonLd={jsonLd}>
   <PageHero title={area.data.headline} eyebrow="Service area" lede={area.data.summary} />
 
   <div class="sheet z-10 overflow-hidden bg-paper-raised">

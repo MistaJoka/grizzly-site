@@ -12,13 +12,14 @@
     "astro": "astro",
     "test:unit": "vitest run",
     "test:e2e": "playwright test",
-    "test": "npm run test:unit && npm run build && npm run test:e2e",
+    "test": "npm run test:unit && SITE_URL=${SITE_URL:-http://localhost:4321} npm run build && SITE_URL=${SITE_URL:-http://localhost:4321} npm run test:seo && npm run test:e2e",
     "placeholders": "node scripts/generate-placeholders.mjs",
     "icons": "node scripts/generate-icons.mjs",
     "prebuild": "node scripts/generate-placeholders.mjs",
     "test:perf": "lhci autorun",
     "predev": "node scripts/generate-placeholders.mjs",
-    "check:config": "node scripts/check-config.mjs"
+    "check:config": "node scripts/check-config.mjs",
+    "test:seo": "vitest run --config vitest.seo.config.ts"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
@@ -39,6 +40,7 @@
     "@playwright/test": "^1.63.0",
     "@vitest/ui": "^4.1.11",
     "jsdom": "^29.1.1",
+    "node-html-parser": "^7.0.1",
     "sharp": "^0.35.4",
     "vitest": "^4.1.11"
   }

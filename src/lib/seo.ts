@@ -6,9 +6,10 @@ function origin(site: URL | undefined): string {
   return (site?.origin ?? FALLBACK_ORIGIN).replace(/\/$/, '');
 }
 
+/** Route form of a pathname: no trailing slash, no .html (build.format 'file' puts it in Astro.url). */
 export function canonical(pathname: string, site: URL | undefined): string {
-  const path = pathname === '/' ? '/' : pathname.replace(/\/+$/, '');
-  return `${origin(site)}${path}`;
+  const path = pathname.replace(/\/index\.html$/, '/').replace(/\.html$/, '').replace(/\/+$/, '');
+  return `${origin(site)}${path === '' ? '/' : path}`;
 }
 
 export function absoluteUrl(path: string, site: URL | undefined): string {
@@ -37,4 +38,9 @@ export function serviceTitle(service: string): string {
 /** `<Service> in <Town>, <ST>`: the service-in-town page title before the site template. */
 export function localTitle(service: string, town: string, state: string): string {
   return `${service} in ${town}, ${state}`;
+}
+
+/** `Lawn care & tree installs in <Town>, <ST>`: the area page title before the site template. */
+export function areaTitle(town: string, state: string): string {
+  return `Lawn care & tree installs in ${town}, ${state}`;
 }

@@ -118,7 +118,7 @@ const siteConfig: SiteConfig = {
     defaultTitle: 'Grizzly Lawn Care | Lawn care and tree installs in Miami-Dade',
     titleTemplate: '%s | Grizzly Lawn Care',
     defaultDescription:
-      'Grizzly Lawn Care is a Miami landscaping company run by Alex Bermudez: lawn maintenance, bush and hedge trimming, mulching, pressure washing, and tree and plant installs for homes, HOAs and commercial properties in Miami-Dade.',
+      'Miami landscaping company run by Alex Bermudez: lawn maintenance, hedge trimming, mulching, pressure washing, and tree and plant installs across Miami-Dade.',
     ogImage: '/og/default.jpg',
   },
 };

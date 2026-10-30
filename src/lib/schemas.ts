@@ -36,6 +36,8 @@ export const areaSchema = z.object({
   localNote: z.string().min(200),
   neighborhoods: z.array(z.string().min(1)).min(3),
   services: z.array(z.string().min(1)).min(1),
+  seoTitle: z.string().min(1).optional(),
+  seoDescription: z.string().min(1).optional(),
 });
 
 // Only facts Alex confirmed. Photos are optional: a project without photos renders text only.

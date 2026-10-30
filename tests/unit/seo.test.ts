@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { absoluteUrl, canonical, DESC_MAX, DESC_MIN, localTitle, pageTitle, serviceTitle, TITLE_MAX, TITLE_MIN } from '../../src/lib/seo';
+import { absoluteUrl, areaTitle, canonical, DESC_MAX, DESC_MIN, localTitle, pageTitle, serviceTitle, TITLE_MAX, TITLE_MIN } from '../../src/lib/seo';
 
 const site = new URL('https://grizzly.example.test');
 
@@ -10,6 +10,11 @@ describe('canonical', () => {
   it('strips a trailing slash from non-root paths', () => {
     expect(canonical('/services/', site)).toBe('https://grizzly.example.test/services');
     expect(canonical('/areas/miami/', site)).toBe('https://grizzly.example.test/areas/miami');
+  });
+  it('drops the .html suffix and /index.html that build.format "file" puts in the pathname', () => {
+    expect(canonical('/services.html', site)).toBe('https://grizzly.example.test/services');
+    expect(canonical('/services/lawn-maintenance/kendall.html', site)).toBe('https://grizzly.example.test/services/lawn-maintenance/kendall');
+    expect(canonical('/index.html', site)).toBe('https://grizzly.example.test/');
   });
   it('keeps the root path as a single slash', () => {
     expect(canonical('/', site)).toBe('https://grizzly.example.test/');
@@ -44,6 +49,10 @@ describe('location-aware titles', () => {
   });
   it('names the town on local pages', () => {
     expect(localTitle('Mulching & Planting Beds', 'Coral Gables', 'FL')).toBe('Mulching & Planting Beds in Coral Gables, FL');
+  });
+  it('names the town on area pages and stays inside the bound for the longest town', () => {
+    expect(areaTitle('Coral Gables', 'FL')).toBe('Lawn care & tree installs in Coral Gables, FL');
+    expect(pageTitle(areaTitle('Coral Gables', 'FL')).length).toBeLessThanOrEqual(TITLE_MAX);
   });
   it('keeps the longest service + town inside the title bound once templated', () => {
     const longest = pageTitle(localTitle('Mulching & Planting Beds', 'Coral Gables', 'FL'));
