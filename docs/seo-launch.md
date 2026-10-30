@@ -44,21 +44,32 @@ allows one custom domain per Pages site, so setting `<domain>` already drops `gr
   `gh variable set GOOGLE_SITE_VERIFICATION -R MistaJoka/grizzly-site -b "<token>"`.
 - Bing Webmaster Tools: import from Search Console, or `gh variable set BING_SITE_VERIFICATION ... -b "<token>"`.
 
-Either variable makes the next build emit the matching `<meta>` tag. Unset means no tag.
+Either variable makes the next build emit the matching `<meta>` tag (unset means no tag). Trigger that build
+now, while still held back, and click Verify in the console:
+
+```bash
+gh workflow run pages.yml -R MistaJoka/grizzly-site
+```
 
 ## 3. Go live
 
 ```bash
 gh variable delete HOLD_BACK -R MistaJoka/grizzly-site
-git commit --allow-empty -m "Launch on <domain>" && git push   # triggers the Pages deploy
+gh workflow run pages.yml -R MistaJoka/grizzly-site
 ```
 
 Confirm, from a terminal:
 
 ```bash
-curl -s https://<domain>/robots.txt        # Allow: /  and a Sitemap: line
-curl -s https://<domain>/ | grep -c noindex   # 0
-curl -sI https://<domain>/services | head -1  # HTTP/2 200 (no 301)
+curl -s https://<domain>/robots.txt          # Allow: /  and a Sitemap: line
+curl -s https://<domain>/ | grep -c noindex  # 0
+# build.format 'file' means dist has services.html AND services/ side by side. Every one of these
+# must answer 200 with no redirect (a 301 to a trailing slash here means the host prefers the
+# directory; the fallback is directory output + trailingSlash 'always', with canonical() and the
+# audit changed to keep the slash):
+for u in /services /work /services/lawn-maintenance /services/lawn-maintenance/kendall; do
+  curl -s -o /dev/null -w "$u %{http_code} %{redirect_url}\n" https://<domain>$u
+done
 ```
 
 ## 4. Tell the engines
@@ -81,7 +92,7 @@ curl -sI https://<domain>/services | head -1  # HTTP/2 200 (no 301)
 - **New service-in-town page:** add `src/content/local/<service>--<area>.md` (copy an existing one). It appears
   at `/services/<service>/<area>`, in the sitemap, and in the links from the service and area pages. The schema
   rejects fewer than 300 characters of `localNote` or fewer than 2 FAQs, and `npm run test:seo` rejects duplicate
-  titles or descriptions.
+  titles or descriptions. Several pages per town are fine; the only rule is every town keeps at least one.
 - **Title or description tweaks:** `seoTitle` / `seoDescription` in a service, area or local page's frontmatter.
 - **New area:** add `src/content/areas/<slug>.md`, add the town to `SERVED_AREAS` in `src/lib/schema.ts`
   (the content-integrity test enforces this), and update the area count in `tests/unit/content-integrity.test.ts`.

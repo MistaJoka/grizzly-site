@@ -55,11 +55,13 @@ const jsonLd = [
   <PageHero title={entry.data.headline} eyebrow={`${service.data.title} · ${town}, ${state}`} lede={entry.data.summary}>
     <nav slot="meta" aria-label="Breadcrumb" class="mt-5 text-[length:var(--step--1)] text-ink-muted">
       <ol class="flex flex-wrap items-center gap-2">
+        <li><a href={withBase('/')} class="underline-offset-4 hover:underline">Home</a></li>
+        <li aria-hidden="true">/</li>
         <li><a href={withBase('/services')} class="underline-offset-4 hover:underline">Services</a></li>
         <li aria-hidden="true">/</li>
         <li><a href={withBase(`/services/${service.id}`)} class="underline-offset-4 hover:underline">{service.data.title}</a></li>
         <li aria-hidden="true">/</li>
-        <li><a href={withBase(`/areas/${area.id}`)} class="underline-offset-4 hover:underline">{town}</a></li>
+        <li aria-current="page" class="text-ink">{town}</li>
       </ol>
     </nav>
   </PageHero>

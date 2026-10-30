@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { DESC_MAX, DESC_MIN, TITLE_MAX, TITLE_MIN } from '../../src/lib/seo';
 import {
-  canonicalFor, EXPECT_LIVE, indexablePages, isInternal, jsonLd, NON_INDEXABLE, pages, requireDist, resolves, robots, SITE_URL, sitemapUrls,
+  canonicalFor, EXPECT_LIVE, indexablePages, isCanonicalForm, isInternal, jsonLd, NON_INDEXABLE, pages, requireDist, resolves, robots, SITE_URL, sitemapUrls,
 } from './dist';
 
 beforeAll(requireDist);
@@ -118,6 +118,26 @@ describe('links and images', () => {
       }
     }
     expect(broken).toEqual([]);
+  });
+
+  it('every internal page href is already in canonical form (no trailing slash, no .html)', () => {
+    const offenders: string[] = [];
+    for (const page of pages()) {
+      for (const href of attr(page, 'a[href]', 'href')) {
+        if (isInternal(href) && !isCanonicalForm(href)) offenders.push(`${page.path} -> ${href}`);
+      }
+    }
+    expect(offenders).toEqual([]);
+  });
+
+  it('isCanonicalForm rejects the link shapes that 404 or redirect on GitHub Pages', () => {
+    expect(isCanonicalForm('/services/')).toBe(false);
+    expect(isCanonicalForm('/services.html')).toBe(false);
+    expect(isCanonicalForm('/services/index.html')).toBe(false);
+    expect(isCanonicalForm('/services')).toBe(true);
+    expect(isCanonicalForm('/')).toBe(true);
+    expect(isCanonicalForm('/robots.txt')).toBe(true);
+    expect(isCanonicalForm('/services?x=1#faq')).toBe(true);
   });
 
   it('every img on an indexable page has alt text, or is decorative: inside a labelled link or an aria-hidden block', () => {

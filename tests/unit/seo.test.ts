@@ -55,8 +55,9 @@ describe('location-aware titles', () => {
     expect(pageTitle(areaTitle('Coral Gables', 'FL')).length).toBeLessThanOrEqual(TITLE_MAX);
   });
   it('keeps the longest service + town inside the title bound once templated', () => {
-    const longest = pageTitle(localTitle('Mulching & Planting Beds', 'Coral Gables', 'FL'));
-    expect(longest.length).toBeLessThanOrEqual(TITLE_MAX);
+    // 25-character service names ("Tree & Plant Installation", "Lawn Mowing & Maintenance") + the longest town.
+    const longest = pageTitle(localTitle('Tree & Plant Installation', 'Coral Gables', 'FL'));
+    expect(longest.length).toBe(TITLE_MAX);
     expect(TITLE_MIN).toBeLessThan(TITLE_MAX);
     expect(DESC_MIN).toBeLessThan(DESC_MAX);
   });

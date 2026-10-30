@@ -59,4 +59,9 @@ test('a service-in-town page renders its town, local note, FAQs and breadcrumb l
   await expect(page.getByRole('region', { name: /common questions/i }).locator('dt')).not.toHaveCount(0);
   await expect(page.locator('main a[href="/services/lawn-maintenance"]').first()).toBeVisible();
   await expect(page.locator('main a[href="/areas/kendall"]').first()).toBeVisible();
+
+  // The visible trail matches the BreadcrumbList schema: Home > Services > Service > Town (current page).
+  const crumbs = page.getByRole('navigation', { name: /breadcrumb/i });
+  await expect(crumbs.locator('a[href="/"]')).toHaveText('Home');
+  await expect(crumbs.locator('[aria-current="page"]')).toHaveText('Kendall');
 });

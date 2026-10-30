@@ -68,6 +68,17 @@ export function resolves(href: string): boolean {
 
 export const isInternal = (href: string): boolean => href.startsWith('/') && !href.startsWith('//');
 
+/**
+ * Page hrefs must be in canonical form: no trailing slash (except '/'), no .html, no /index.html.
+ * With build.format 'file' a trailing-slash link is a 404 on GitHub Pages, not a redirect.
+ */
+export function isCanonicalForm(href: string): boolean {
+  const clean = href.split(/[?#]/)[0];
+  if (clean === '/') return true;
+  if (/\.[a-z0-9]+$/i.test(clean) && !/\.html$/i.test(clean)) return true; // a file: /robots.txt, /og/default.jpg
+  return !clean.endsWith('/') && !/\.html$/i.test(clean);
+}
+
 export function sitemapUrls(): string[] {
   const index = readFileSync(join(DIST, 'sitemap-index.xml'), 'utf-8');
   const files = [...index.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1].split('/').pop()!);

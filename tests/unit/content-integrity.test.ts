@@ -21,7 +21,7 @@ describe('content inventory', () => {
     expect(ids('src/content/services')).toHaveLength(5);
     expect(ids('src/content/areas')).toHaveLength(6);
     expect(ids('src/content/projects')).toHaveLength(1);
-    expect(ids('src/content/local')).toHaveLength(6);
+    expect(ids('src/content/local').length).toBeGreaterThanOrEqual(6);
   });
 
   it('ships no testimonials: only real, permissioned ones may be added later', () => {
@@ -103,8 +103,9 @@ describe('local (service-in-town) pages are gated on real content', () => {
     }
   });
 
-  it('covers every area once (one seeded page per town)', () => {
-    expect(localIds.map((id) => id.split('--')[1]).sort()).toEqual([...areaIds].sort());
+  it('covers every area at least once (more pages per town may be added without code changes)', () => {
+    const covered = new Set(localIds.map((id) => id.split('--')[1]));
+    for (const area of areaIds) expect([...covered], area).toContain(area);
   });
 
   it('gives every local page a distinct localNote of at least 300 characters', () => {
@@ -118,9 +119,9 @@ describe('local (service-in-town) pages are gated on real content', () => {
     expect(new Set(notes).size).toBe(notes.length);
   });
 
-  it('has no prices, ratings or review numbers in local content', () => {
+  it('has no prices, ratings, review numbers or "crew" language in local content (owner-operated)', () => {
     for (const id of localIds) {
-      expect(readFileSync(`src/content/local/${id}.md`, 'utf-8'), id).not.toMatch(/\$\d|\b4\.8\d?\b|\b\d+ reviews\b|LawnStarter/i);
+      expect(readFileSync(`src/content/local/${id}.md`, 'utf-8'), id).not.toMatch(/\$\d|\b4\.8\d?\b|\b\d+ reviews\b|LawnStarter|\bcrews?\b/i);
     }
   });
 });
