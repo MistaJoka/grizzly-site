@@ -16,17 +16,33 @@ function omitEmpty<T extends Record<string, unknown>>(obj: T): Partial<T> {
   ) as Partial<T>;
 }
 
+export function businessId(site: URL | undefined): string {
+  return `${absoluteUrl('/', site)}#business`;
+}
+
 export function localBusinessJsonLd(
   site: URL | undefined,
   config: SiteConfig = siteConfig,
   areas: string[] = SERVED_AREAS,
+  services: { name: string; url: string }[] = [],
 ) {
   const { business } = config;
   const sameAs = config.social.map((s) => s.href).filter(Boolean);
+  const hasOfferCatalog =
+    services.length > 0
+      ? {
+          '@type': 'OfferCatalog',
+          name: 'Services',
+          itemListElement: services.map((service) => ({
+            '@type': 'Offer',
+            itemOffered: { '@type': 'Service', name: service.name, url: service.url },
+          })),
+        }
+      : undefined;
   return omitEmpty({
     '@context': 'https://schema.org',
     '@type': 'LandscapingBusiness',
-    '@id': `${absoluteUrl('/', site)}#business`,
+    '@id': businessId(site),
     name: business.name,
     legalName: business.legalName,
     description: config.seo.defaultDescription,
@@ -47,6 +63,7 @@ export function localBusinessJsonLd(
     },
     areaServed: areas.map((name) => ({ '@type': 'City', name })),
     image: absoluteUrl(config.seo.ogImage, site),
+    hasOfferCatalog,
   });
 }
 
@@ -55,6 +72,8 @@ export function serviceJsonLd(input: {
   description: string;
   url: string;
   areaServed: string[];
+  /** When given, the provider is linked to the page's business node by @id (one graph, not two nodes). */
+  site?: URL;
 }) {
   return {
     '@context': 'https://schema.org',
@@ -63,7 +82,11 @@ export function serviceJsonLd(input: {
     description: input.description,
     url: input.url,
     serviceType: input.name,
-    provider: { '@type': 'LandscapingBusiness', name: siteConfig.business.name },
+    provider: omitEmpty({
+      '@type': 'LandscapingBusiness',
+      '@id': input.site ? businessId(input.site) : '',
+      name: siteConfig.business.name,
+    }),
     areaServed: input.areaServed.map((name) => ({ '@type': 'City', name })),
   };
 }

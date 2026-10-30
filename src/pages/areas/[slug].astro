@@ -25,6 +25,12 @@ const services = area.data.services
   .filter((service): service is NonNullable<typeof service> => Boolean(service));
 
 const spans = gridSpans(services.length);
+// A service card links to its service-in-town page when one has been written for this area.
+const localByService = new Map(
+  (await getCollection('local')).filter((entry) => entry.data.area === area.id).map((entry) => [entry.data.service, entry]),
+);
+const serviceHref = (serviceId: string) =>
+  localByService.has(serviceId) ? `/services/${serviceId}/${area.id}` : `/services/${serviceId}`;
 
 const jsonLd = [
   serviceJsonLd({
@@ -32,6 +38,7 @@ const jsonLd = [
     description: area.data.summary,
     url,
     areaServed: [area.data.town],
+    site: Astro.site,
   }),
   breadcrumbJsonLd([
     { name: 'Home', url: canonical('/', Astro.site) },
@@ -73,7 +80,7 @@ const jsonLd = [
       <ul class="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-6 lg:gap-8">
         {services.map((service, i) => (
           <li class={`reveal ${spans[i]} ${i === services.length - 1 && services.length % 2 ? 'md:max-lg:col-span-2' : ''}`}>
-            <a href={withBase(`/services/${service.id}`)} class="group block h-full rounded-[var(--radius-panel)] bg-paper-raised p-7 shadow-[var(--shadow-panel)] transition-transform duration-[var(--dur-base)] ease-[var(--ease-out)] hover:-translate-y-1">
+            <a href={withBase(serviceHref(service.id))} class="group block h-full rounded-[var(--radius-panel)] bg-paper-raised p-7 shadow-[var(--shadow-panel)] transition-transform duration-[var(--dur-base)] ease-[var(--ease-out)] hover:-translate-y-1">
               <h2 class="text-[length:var(--step-2)] leading-tight group-hover:text-moss">{service.data.title}</h2>
               <p class="mt-3 text-ink-muted">{service.data.summary}</p>
             </a>

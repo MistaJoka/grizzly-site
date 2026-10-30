@@ -25,9 +25,15 @@ const url = canonical(`/services/${service.id}`, Astro.site);
 const areas = (await getCollection('areas')).sort((a, b) => a.data.order - b.data.order);
 const towns = areas.map((area) => area.data.town);
 const relatedAreas = areas.filter((area) => area.data.services.includes(service.id));
+// A town links to its service-in-town page when one has been written, otherwise to the area page.
+const localByArea = new Map(
+  (await getCollection('local')).filter((entry) => entry.data.service === service.id).map((entry) => [entry.data.area, entry]),
+);
+const areaHref = (areaId: string) =>
+  localByArea.has(areaId) ? `/services/${service.id}/${areaId}` : `/areas/${areaId}`;
 
 const jsonLd = [
-  serviceJsonLd({ name: service.data.title, description: service.data.summary, url, areaServed: towns }),
+  serviceJsonLd({ name: service.data.title, description: service.data.summary, url, areaServed: towns, site: Astro.site }),
   faqJsonLd(service.data.faqs),
   breadcrumbJsonLd([
     { name: 'Home', url: canonical('/', Astro.site) },
@@ -36,7 +42,7 @@ const jsonLd = [
   ]),
 ];
 ---
-<BaseLayout title={serviceTitle(service.data.title)} description={service.data.summary} jsonLd={jsonLd}>
+<BaseLayout title={service.data.seoTitle ?? serviceTitle(service.data.title)} description={service.data.seoDescription ?? service.data.summary} jsonLd={jsonLd}>
   <PageHero title={service.data.title} eyebrow="Services" lede={service.data.summary} />
 
   <div class="sheet z-10 bg-paper pt-6 md:pt-10">
@@ -94,7 +100,7 @@ const jsonLd = [
         <ul class="mt-6 flex flex-wrap gap-3">
           {relatedAreas.map((area) => (
             <li>
-              <a href={withBase(`/areas/${area.id}`)} class="block rounded-full border border-ink/20 bg-paper-raised px-5 py-2 transition-colors hover:border-ink">
+              <a href={withBase(areaHref(area.id))} class="block rounded-full border border-ink/20 bg-paper-raised px-5 py-2 transition-colors hover:border-ink">
                 {area.data.town}, {area.data.state}
               </a>
             </li>
