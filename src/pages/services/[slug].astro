@@ -10,7 +10,7 @@ import ClosingCTA from '../../components/sections/ClosingCTA.astro';
 import PageHero from '../../components/sections/PageHero.astro';
 import { resolveImage } from '../../lib/images';
 import { breadcrumbJsonLd, faqJsonLd, serviceJsonLd } from '../../lib/schema';
-import { canonical } from '../../lib/seo';
+import { canonical, serviceTitle } from '../../lib/seo';
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const services = await getCollection('services');
@@ -36,7 +36,7 @@ const jsonLd = [
   ]),
 ];
 ---
-<BaseLayout title={service.data.title} description={service.data.summary} jsonLd={jsonLd}>
+<BaseLayout title={serviceTitle(service.data.title)} description={service.data.summary} jsonLd={jsonLd}>
   <PageHero title={service.data.title} eyebrow="Services" lede={service.data.summary} />
 
   <div class="sheet z-10 bg-paper pt-6 md:pt-10">

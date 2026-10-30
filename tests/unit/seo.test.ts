@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { absoluteUrl, canonical, pageTitle } from '../../src/lib/seo';
+import { absoluteUrl, canonical, DESC_MAX, DESC_MIN, localTitle, pageTitle, serviceTitle, TITLE_MAX, TITLE_MIN } from '../../src/lib/seo';
 
 const site = new URL('https://grizzly.example.test');
 
@@ -35,5 +35,20 @@ describe('absoluteUrl', () => {
   });
   it('passes through an already-absolute URL', () => {
     expect(absoluteUrl('https://cdn.example.com/a.jpg', site)).toBe('https://cdn.example.com/a.jpg');
+  });
+});
+
+describe('location-aware titles', () => {
+  it('names the county on service pages', () => {
+    expect(serviceTitle('Tree & Plant Installation')).toBe('Tree & Plant Installation in Miami-Dade, FL');
+  });
+  it('names the town on local pages', () => {
+    expect(localTitle('Mulching & Planting Beds', 'Coral Gables', 'FL')).toBe('Mulching & Planting Beds in Coral Gables, FL');
+  });
+  it('keeps the longest service + town inside the title bound once templated', () => {
+    const longest = pageTitle(localTitle('Mulching & Planting Beds', 'Coral Gables', 'FL'));
+    expect(longest.length).toBeLessThanOrEqual(TITLE_MAX);
+    expect(TITLE_MIN).toBeLessThan(TITLE_MAX);
+    expect(DESC_MIN).toBeLessThan(DESC_MAX);
   });
 });

@@ -20,3 +20,21 @@ export function pageTitle(title?: string): string {
   if (!title) return siteConfig.seo.defaultTitle;
   return siteConfig.seo.titleTemplate.replace('%s', title);
 }
+
+/** Audit bounds (characters). Google shows roughly 60 title / 155 description chars on desktop. */
+export const TITLE_MIN = 20;
+export const TITLE_MAX = 65;
+export const DESC_MIN = 70;
+export const DESC_MAX = 160;
+
+const COUNTY = 'Miami-Dade, FL';
+
+/** `<Service> in Miami-Dade, FL`: the service page title before the site template. */
+export function serviceTitle(service: string): string {
+  return `${service} in ${COUNTY}`;
+}
+
+/** `<Service> in <Town>, <ST>`: the service-in-town page title before the site template. */
+export function localTitle(service: string, town: string, state: string): string {
+  return `${service} in ${town}, ${state}`;
+}
