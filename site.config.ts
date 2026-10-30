@@ -50,6 +50,11 @@ export interface SiteConfig {
      * Delete the variable to go live. Env: HOLD_BACK
      */
     holdBack: string;
+    /**
+     * Optional search-engine ownership tokens, emitted as <meta> tags only when set.
+     * Env: GOOGLE_SITE_VERIFICATION (Search Console, HTML-tag method), BING_SITE_VERIFICATION (Webmaster Tools).
+     */
+    verification: { google: string; bing: string };
   };
   quote: {
     /**
@@ -96,6 +101,7 @@ const siteConfig: SiteConfig = {
     url: env('SITE_URL'), // TODO(Alex): set the real domain
     basePath: env('BASE_PATH'),
     holdBack: env('HOLD_BACK'),
+    verification: { google: env('GOOGLE_SITE_VERIFICATION'), bing: env('BING_SITE_VERIFICATION') },
   },
   quote: {
     groundworkQuoteUrl: env('GROUNDWORK_QUOTE_URL'), // TODO: hosted /r/<slug> URL

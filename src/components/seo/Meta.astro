@@ -9,11 +9,14 @@ const resolvedTitle = pageTitle(title);
 const resolvedDescription = description ?? siteConfig.seo.defaultDescription;
 const url = canonical(Astro.url.pathname, Astro.site);
 const image = absoluteUrl(ogImage ?? siteConfig.seo.ogImage, Astro.site);
+const { verification } = siteConfig.site;
 ---
 <title>{resolvedTitle}</title>
 <meta name="description" content={resolvedDescription} />
 <link rel="canonical" href={url} />
 {noindex && <meta name="robots" content="noindex, nofollow" />}
+{verification.google && <meta name="google-site-verification" content={verification.google} />}
+{verification.bing && <meta name="msvalidate.01" content={verification.bing} />}
 
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content={siteConfig.business.name} />

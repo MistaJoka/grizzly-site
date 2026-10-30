@@ -24,11 +24,18 @@ describe('siteConfig', () => {
   it('provides a title template containing a placeholder', () => {
     expect(siteConfig.seo.titleTemplate).toContain('%s');
   });
+
+  it('carries optional search-engine verification tokens, empty by default and never "missing"', () => {
+    expect(Object.keys(siteConfig.site.verification).sort()).toEqual(['bing', 'google']);
+    expect(siteConfig.site.verification.google).toBe('');
+    expect(siteConfig.site.verification.bing).toBe('');
+    expect(missingConfig().join(' ')).not.toMatch(/verification/);
+  });
 });
 
 describe('unknown values are empty placeholders, not invented', () => {
   it('reports every empty value through missingConfig', () => {
-    const empty = missingConfig({ ...siteConfig, site: { url: '', basePath: '' }, quote: { groundworkQuoteUrl: '' } });
+    const empty = missingConfig({ ...siteConfig, site: { url: '', basePath: '', holdBack: '', verification: { google: '', bing: '' } }, quote: { groundworkQuoteUrl: '' } });
     expect(empty).toEqual(expect.arrayContaining(['business.phone', 'business.email', 'business.credentials.generalLiability']));
     expect(empty).toContain('site.url (SITE_URL)');
     expect(empty).toContain('quote.groundworkQuoteUrl (GROUNDWORK_QUOTE_URL)');
@@ -44,12 +51,12 @@ describe('unknown values are empty placeholders, not invented', () => {
   });
 
   it('treats the site as not live until a URL is configured', () => {
-    expect(isLive({ ...siteConfig, site: { url: '', basePath: '', holdBack: '' } })).toBe(false);
-    expect(isLive({ ...siteConfig, site: { url: 'https://example.com', basePath: '', holdBack: '' } })).toBe(true);
+    expect(isLive({ ...siteConfig, site: { url: '', basePath: '', holdBack: '', verification: { google: '', bing: '' } } })).toBe(false);
+    expect(isLive({ ...siteConfig, site: { url: 'https://example.com', basePath: '', holdBack: '', verification: { google: '', bing: '' } } })).toBe(true);
   });
 
   it('keeps a staging build with HOLD_BACK set out of search even with a real URL', () => {
-    expect(isLive({ ...siteConfig, site: { url: 'https://example.com', basePath: '', holdBack: '1' } })).toBe(false);
+    expect(isLive({ ...siteConfig, site: { url: 'https://example.com', basePath: '', holdBack: '1', verification: { google: '', bing: '' } } })).toBe(false);
   });
 });
 
