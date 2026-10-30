@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { areaSchema, projectSchema, serviceSchema, testimonialSchema } from '../../src/lib/schemas';
+import { areaSchema, localSchema, projectSchema, serviceSchema, testimonialSchema } from '../../src/lib/schemas';
 
 const validArea = {
   town: 'Miami',
@@ -79,5 +79,33 @@ describe('testimonialSchema', () => {
     const { source, ...noSource } = real;
     expect(() => testimonialSchema.parse(noSource)).toThrow();
     expect(() => testimonialSchema.parse({ ...real, permission: false })).toThrow();
+  });
+});
+
+describe('localSchema', () => {
+  const validLocal = {
+    service: 'lawn-maintenance',
+    area: 'kendall',
+    headline: 'Lawn mowing in Kendall, FL',
+    summary: 'Weekly and biweekly mowing, edging and trimming for Kendall homes.',
+    localNote: 'x'.repeat(300),
+    faqs: [
+      { question: 'How often?', answer: 'Weekly in summer, every two weeks in the cooler months.' },
+      { question: 'Do you edge?', answer: 'Yes, edging and trimming are part of every visit.' },
+    ],
+  };
+  it('accepts a fully specified local page', () => {
+    expect(() => localSchema.parse(validLocal)).not.toThrow();
+  });
+  it('rejects a localNote shorter than 300 characters (no thin doorway pages)', () => {
+    expect(() => localSchema.parse({ ...validLocal, localNote: 'x'.repeat(299) })).toThrow();
+  });
+  it('requires at least two FAQs', () => {
+    expect(() => localSchema.parse({ ...validLocal, faqs: validLocal.faqs.slice(0, 1) })).toThrow();
+  });
+  it('allows optional seoTitle and seoDescription overrides on local and service pages', () => {
+    expect(() => localSchema.parse({ ...validLocal, seoTitle: 'Kendall lawn mowing', seoDescription: 'd'.repeat(80) })).not.toThrow();
+    expect(serviceSchema.shape).toHaveProperty('seoTitle');
+    expect(serviceSchema.shape).toHaveProperty('seoDescription');
   });
 });

@@ -8,6 +8,23 @@ export const serviceSchema = z.object({
   heroAlt: z.string().min(1),
   steps: z.array(z.object({ title: z.string().min(1), body: z.string().min(20) })).min(3),
   faqs: z.array(z.object({ question: z.string().min(1), answer: z.string().min(1) })).min(1),
+  /** Optional overrides for the <title> (before the site template) and meta description. */
+  seoTitle: z.string().min(1).optional(),
+  seoDescription: z.string().min(1).optional(),
+});
+
+// A service-in-town landing page. One file per pair, named `<service>--<area>.md`, and the page is
+// built ONLY when the file exists. The 300-character floor and the two-FAQ minimum keep these from
+// becoming templated doorway pages: every entry has to say something true about that pair.
+export const localSchema = z.object({
+  service: z.string().min(1),
+  area: z.string().min(1),
+  headline: z.string().min(1),
+  summary: z.string().min(20),
+  localNote: z.string().min(300),
+  faqs: z.array(z.object({ question: z.string().min(1), answer: z.string().min(1) })).min(2),
+  seoTitle: z.string().min(1).optional(),
+  seoDescription: z.string().min(1).optional(),
 });
 
 export const areaSchema = z.object({
