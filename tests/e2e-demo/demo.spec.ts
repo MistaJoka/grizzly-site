@@ -85,3 +85,34 @@ test.describe('trust strip', () => {
     await expect(proof).toContainText(/insured/i);
   });
 });
+
+test.describe('sample proof', () => {
+  test('home shows one review labelled as a sample and an illustrated before/after', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('blockquote')).toHaveCount(1);
+    await expect(page.locator('figcaption').first()).toContainText(/^Sample review/);
+    const pair = page.getByRole('region', { name: /before and after/i });
+    await expect(pair).toHaveCount(1);
+    await expect(pair).toContainText(/illustrated sample/i);
+    const alts = await pair.locator('img').evaluateAll((nodes) => nodes.map((n) => n.getAttribute('alt') ?? ''));
+    expect(alts).toHaveLength(2);
+    for (const alt of alts) expect(alt).toMatch(/illustration/i);
+  });
+
+  test('about lists all three sample reviews, each labelled', async ({ page }) => {
+    await page.goto('/about');
+    await expect(page.locator('blockquote')).toHaveCount(3);
+    for (const caption of await page.locator('figcaption').allTextContents()) expect(caption).toMatch(/^Sample review/);
+  });
+
+  test('the 40-tree project page shows the illustrated before and after', async ({ page }) => {
+    await page.goto('/work/forty-tree-installation');
+    const figures = page.getByRole('region', { name: /project photos/i }).locator('figure');
+    await expect(figures).toHaveCount(2);
+    await expect(figures.nth(0)).toContainText(/before/i);
+    await expect(figures.nth(1)).toContainText(/after/i);
+    for (const alt of await figures.locator('img').evaluateAll((nodes) => nodes.map((n) => n.getAttribute('alt') ?? ''))) {
+      expect(alt).toMatch(/illustration/i);
+    }
+  });
+});

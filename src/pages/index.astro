@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
-import siteConfig, { credentialList } from '../../site.config';
+import siteConfig, { credentialList, isDemo } from '../../site.config';
+import { DEMO_BEFORE_AFTER, SAMPLE_TESTIMONIALS } from '../lib/demo';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BeforeAfter from '../components/sections/BeforeAfter.astro';
 import ClosingCTA from '../components/sections/ClosingCTA.astro';
@@ -38,7 +39,21 @@ const areas = (await getCollection('areas')).sort(byOrder).map((area) => ({
 
 // Testimonials ship empty. The first real, permissioned one (if any) is shown.
 const testimonials = (await getCollection('testimonials')).sort(byOrder);
-const lead = testimonials[0];
+const lead = testimonials[0]
+  ? { quote: testimonials[0].data.quote, attribution: testimonials[0].data.attribution, town: testimonials[0].data.town }
+  : isDemo() ? SAMPLE_TESTIMONIALS[0] : undefined;
+
+// In demo mode the 40-tree job gets an illustrated pair until Alex shares photos.
+const beforeAfter = withPhotos
+  ? {
+      title: withPhotos.data.title,
+      town: withPhotos.data.town ?? 'Miami-Dade',
+      beforeImage: withPhotos.data.beforeImage!,
+      beforeAlt: withPhotos.data.beforeAlt!,
+      afterImage: withPhotos.data.afterImage!,
+      afterAlt: withPhotos.data.afterAlt!,
+    }
+  : isDemo() ? DEMO_BEFORE_AFTER : undefined;
 
 // Proof chips: public record first, the owner promise, the first supplied credential (if any), reach last.
 const { business } = siteConfig;
@@ -66,17 +81,11 @@ const steps = [
   />
   <TrustStrip items={proof} />
   <OfferingStrip services={services} />
-  {withPhotos && (
+  {beforeAfter && (
     <BeforeAfter
       title="The same property, before and after."
-      project={{
-        title: withPhotos.data.title,
-        town: withPhotos.data.town ?? 'Miami-Dade',
-        beforeImage: withPhotos.data.beforeImage!,
-        beforeAlt: withPhotos.data.beforeAlt!,
-        afterImage: withPhotos.data.afterImage!,
-        afterAlt: withPhotos.data.afterAlt!,
-      }}
+      project={beforeAfter}
+      note={withPhotos ? undefined : 'Illustrated sample'}
     />
   )}
   <ProcessSteps steps={steps} />
@@ -111,7 +120,7 @@ const steps = [
   </section>
 
   <Proof
-    testimonial={lead ? { quote: lead.data.quote, attribution: lead.data.attribution, town: lead.data.town } : undefined}
+    testimonial={lead}
     credentials={credentialList(siteConfig)}
     yearsInBusiness={new Date().getFullYear() - siteConfig.business.foundedYear}
   />

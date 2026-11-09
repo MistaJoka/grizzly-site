@@ -20,7 +20,8 @@ export default defineConfig({
     { name: 'mobile', use: { ...devices['Pixel 7'] } },
   ],
   webServer: {
-    command: `npm run dev -- --port ${port}`,
+    // --force replaces a stale lock left by a previous run's dev server (Astro refuses to start otherwise).
+    command: `npm run dev -- --port ${port} --force`,
     url: origin,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

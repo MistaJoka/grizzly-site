@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
 import { imageAssetPath } from '../../src/lib/images';
-import { FILES } from '../../scripts/generate-placeholders.mjs';
+import { DEMO_FILES, FILES } from '../../scripts/generate-placeholders.mjs';
+import { DEMO_BEFORE_AFTER } from '../../src/lib/demo';
 
 describe('imageAssetPath', () => {
   it('maps a content path into the assets directory', () => {
@@ -31,7 +32,9 @@ function referencedImages(): string[] {
 }
 
 describe('placeholder generator manifest', () => {
-  const produced = new Set<string>(FILES.map((entry) => `/images/${String(entry[0])}`));
+  const produced = new Set<string>([...FILES, ...DEMO_FILES].map((entry) => `/images/${String(entry[0])}`));
+  // Demo-only drawings are referenced from src/lib/demo.ts, not from content.
+  const demoReferenced = [DEMO_BEFORE_AFTER.beforeImage, DEMO_BEFORE_AFTER.afterImage];
 
   it('produces every image referenced by content', () => {
     const missing = referencedImages().filter((path) => !produced.has(path));
@@ -42,8 +45,15 @@ describe('placeholder generator manifest', () => {
     expect(produced.has('/images/hero.jpg')).toBe(true);
   });
 
+  it('produces the demo before/after pair under images/demo', () => {
+    for (const path of demoReferenced) {
+      expect(path.startsWith('/images/demo/')).toBe(true);
+      expect(produced.has(path), path).toBe(true);
+    }
+  });
+
   it('produces nothing content does not reference, beyond the hero image', () => {
-    const referenced = new Set([...referencedImages(), '/images/hero.jpg']);
+    const referenced = new Set([...referencedImages(), '/images/hero.jpg', ...demoReferenced]);
     const orphans = [...produced].filter((p) => !referenced.has(p));
     expect(orphans).toEqual([]);
   });

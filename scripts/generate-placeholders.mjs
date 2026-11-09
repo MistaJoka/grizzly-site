@@ -1,7 +1,7 @@
 import { access, mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import sharp from 'sharp';
-import { heroFlat, SERVICE_ART } from '../src/lib/art.mjs';
+import { DEMO_ART, heroFlat, SERVICE_ART } from '../src/lib/art.mjs';
 
 const OUT = 'src/assets/images';
 export const OG_FILE = 'public/og/default.jpg';
@@ -18,9 +18,15 @@ export const FILES = [
   ['services/pressure-washing.jpg', 1600, 1200],
 ];
 
+// Demo-only drawings (DEMO_DATA=1): the illustrated before/after pair referenced from src/lib/demo.ts.
+export const DEMO_FILES = [
+  ['demo/forty-trees-before.jpg', 1600, 1000],
+  ['demo/forty-trees-after.jpg', 1600, 1000],
+];
+
 function svg(name, width, height) {
-  const slug = name.replace(/^services\//, '').replace(/\.jpg$/, '');
-  const draw = SERVICE_ART[slug];
+  const slug = name.replace(/^(services|demo)\//, '').replace(/\.jpg$/, '');
+  const draw = SERVICE_ART[slug] ?? DEMO_ART[slug];
   // Service scenes are drawn in their own viewBox, so pin the raster size on them.
   const markup = draw
     ? draw(width, height).replace('<svg ', `<svg width="${width}" height="${height}" `)
@@ -31,7 +37,7 @@ function svg(name, width, height) {
 const exists = (path) => access(path).then(() => true, () => false);
 
 async function generate() {
-for (const [name, width, height] of FILES) {
+for (const [name, width, height] of [...FILES, ...DEMO_FILES]) {
   const target = join(OUT, name);
   // Never overwrite a real photo that has been dropped in at this path.
   if (await exists(target)) continue;
@@ -45,7 +51,7 @@ if (!(await exists(OG_FILE))) {
   await writeFile(OG_FILE, await sharp(svg('og.jpg', 1200, 630)).jpeg({ quality: 86 }).toBuffer());
 }
 
-console.log(`placeholder images ready (${FILES.length + 1})`);
+console.log(`placeholder images ready (${FILES.length + DEMO_FILES.length + 1})`);
 }
 
 // Only generate when invoked directly, so tests can import the manifest.

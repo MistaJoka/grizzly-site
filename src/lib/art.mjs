@@ -337,6 +337,53 @@ export const SERVICE_ART = {
   },
 };
 
+/** Demo-only before/after pair for the 40-tree job: drawn, never mistaken for photographs. */
+export const DEMO_ART = {
+  'forty-trees-before': (W, H) => {
+    const P = PALETTE;
+    const Y = H * 0.5;
+    // Bare ground with thin, uneven grass and three overgrown shrubs.
+    let patches = '';
+    for (let i = 0; i < 9; i += 1) {
+      const cx = W * (0.05 + i * 0.11) + (i % 2 ? W * 0.03 : 0);
+      const cy = Y + (H - Y) * (0.25 + ((i * 37) % 50) / 100);
+      patches += `<ellipse cx="${r(cx)}" cy="${r(cy)}" rx="${r(W * (0.05 + ((i * 13) % 4) * 0.01))}" ry="${r(H * 0.03)}" fill="${P.lawnDark}" opacity="0.55"/>`;
+    }
+    const weeds = [shrub(W * 0.16, Y + H * 0.12, H * 0.07), shrub(W * 0.47, Y + H * 0.2, H * 0.05), shrub(W * 0.78, Y + H * 0.1, H * 0.08)].join('');
+    const overgrown = [shrub(W * 0.3, Y + H * 0.38, H * 0.22), shrub(W * 0.62, Y + H * 0.42, H * 0.26), shrub(W * 0.9, Y + H * 0.36, H * 0.2)].join('');
+    return `${svgOpen(W, H)}${backdrop(W, H, Y)}
+      <rect y="${Y}" width="${W}" height="${H - Y}" fill="${P.mulchLight}"/>
+      ${patches}
+      <path d="${weeds}" fill="${P.lawnDark}"/>
+      <path d="${overgrown}" fill="${P.mid}"/>
+    </svg>`;
+  },
+  'forty-trees-after': (W, H) => {
+    const P = PALETTE;
+    const Y = H * 0.5;
+    const [light, dark] = lawnStripes(W, H, Y, W * 0.5, -H * 0.45, W * 0.16);
+    // A row of staked young palms along the back, each on a mulch ring.
+    let rings = '';
+    let palms = '';
+    let stakes = '';
+    for (let i = 0; i < 7; i += 1) {
+      const x = W * (0.08 + i * 0.14);
+      const gy = Y + H * 0.1;
+      const h = H * 0.3;
+      rings += `<ellipse cx="${r(x)}" cy="${r(gy)}" rx="${r(W * 0.04)}" ry="${r(H * 0.014)}" fill="${P.mulch}"/>`;
+      palms += palm(x, gy, h, i % 2 ? 5 : -5, { fronds: 8, trunk: 0.04 });
+      stakes += `M${r(x - W * 0.03)} ${r(gy)}L${r(x - W * 0.004)} ${r(gy - h * 0.5)}L${r(x + W * 0.001)} ${r(gy - h * 0.5)}L${r(x - W * 0.026)} ${r(gy)}Z`;
+    }
+    return `${svgOpen(W, H)}${backdrop(W, H, Y)}
+      <rect y="${Y}" width="${W}" height="${H - Y}" fill="${P.lawnDark}"/>
+      <path d="${light}" fill="${P.lawnLight}"/><path d="${dark}" fill="${P.lawnDark}"/>
+      ${rings}
+      <path d="${palms}" fill="${P.hedge}"/>
+      <path d="${stakes}" fill="${P.mulchLight}"/>
+    </svg>`;
+  },
+};
+
 /** The hero composed flat, for the Open Graph card and the hero placeholder. */
 export function heroFlat(W = HERO.width, H = HERO.height) {
   const layers = heroLayers();
