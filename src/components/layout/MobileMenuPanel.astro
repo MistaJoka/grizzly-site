@@ -1,0 +1,36 @@
+---
+// The phone menu's dialog. It lives at body level, outside the header, so its z-index is judged in
+// the root stacking context: above every sheet (z ≤ 70) and the action bar (z-80). The toggle and the
+// script that opens it are in MobileMenu.astro and find this element by id.
+import { withBase } from '../../lib/url';
+import siteConfig from '../../../site.config';
+---
+<div
+  id="mobile-menu"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Site navigation"
+  hidden
+  class="fixed inset-0 z-[90] flex flex-col overflow-hidden bg-canopy px-6 py-6 text-paper md:hidden"
+>
+  <div class="flex justify-end">
+    <button type="button" id="menu-close" class="rounded-full border border-paper/50 px-5 py-2 text-[length:var(--step--1)]">
+      Close
+    </button>
+  </div>
+  <div aria-hidden="true" class="stripes absolute inset-x-0 bottom-0 h-28 opacity-25"></div>
+  <ul class="relative mt-16 flex flex-col gap-7">
+    {siteConfig.nav.map((item) => (
+      <li>
+        <a href={withBase(item.href)} class="font-[family-name:var(--font-display)] text-[length:var(--step-4)]">{item.label}</a>
+      </li>
+    ))}
+  </ul>
+  {siteConfig.business.phone && siteConfig.business.phoneHref ? (
+    <a href={siteConfig.business.phoneHref} class="relative mt-auto self-start rounded-full bg-bloom px-7 py-3.5 text-[length:var(--step-0)] font-semibold text-paper-raised">
+      {siteConfig.business.phone}
+    </a>
+  ) : (
+    <a href={withBase('/contact')} class="relative mt-auto self-start rounded-full bg-bloom px-7 py-3.5 text-[length:var(--step-0)] font-semibold text-paper-raised">Request a quote</a>
+  )}
+</div>

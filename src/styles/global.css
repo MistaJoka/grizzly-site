@@ -140,6 +140,11 @@ p { text-wrap: pretty; }
   box-shadow: var(--shadow-sheet);
 }
 
+/* The phone action bar steps aside while the menu dialog is open (the dialog is aria-modal). */
+body:has(#mobile-menu:not([hidden])) [data-testid="action-bar"] {
+  display: none;
+}
+
 /* Mowed-lawn stripes, the one pattern the whole site repeats. */
 .stripes {
   background-image: repeating-linear-gradient(

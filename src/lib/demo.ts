@@ -12,11 +12,12 @@ export const SAMPLE = {
   phoneHref: 'tel:+13055550188',
   email: 'quotes@grizzlylawncare.example',
   hours: ['Mon–Sat, 7:00 am – 6:00 pm'],
-  // Generic wording only. Licences, certifications and exemptions are never sampled.
+  // Generic wording only, each labelled inline: credentials appear in the trust strip as proof, where
+  // the page-top notice may be out of view. Licences, certifications and exemptions are never sampled.
   credentials: {
-    generalLiability: 'General liability insured',
-    commercialAuto: 'Commercial auto insured',
-    businessTaxReceipt: 'Miami-Dade business tax receipt',
+    generalLiability: 'General liability insured (sample)',
+    commercialAuto: 'Commercial auto insured (sample)',
+    businessTaxReceipt: 'Miami-Dade business tax receipt (sample)',
   },
 } as const;
 

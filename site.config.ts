@@ -113,7 +113,9 @@ export const realConfig: SiteConfig = {
     basePath: env('BASE_PATH'),
     holdBack: env('HOLD_BACK'),
     demo: env('DEMO_DATA'),
-    demoAllowIndexable: env('DEMO_ALLOW_INDEXABLE'),
+    // Read outside env() on purpose: env() keys are forwarded by the deploy workflow, and this one must
+    // never be. It exists for CI's Lighthouse run against a demo build.
+    demoAllowIndexable: (typeof process !== 'undefined' && process.env.DEMO_ALLOW_INDEXABLE ? '1' : ''),
     verification: { google: env('GOOGLE_SITE_VERIFICATION'), bing: env('BING_SITE_VERIFICATION') },
   },
   quote: {

@@ -148,3 +148,67 @@ test.describe('preview page', () => {
     await expect(page.locator('#needs')).toHaveCount(1);
   });
 });
+
+test.describe('review fixes', () => {
+  test('the action bar is painted above every section, including the footer', async ({ page, isMobile }) => {
+    test.skip(!isMobile, 'desktop has no bar');
+    await page.goto('/');
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(300);
+    const bar = await box(page, '[data-testid="action-bar"]');
+    const onTop = await page.evaluate(
+      ([x, y]) => Boolean(document.elementFromPoint(x, y)?.closest('[data-testid="action-bar"]')),
+      [bar.x + bar.width / 2, bar.y + bar.height / 2],
+    );
+    expect(onTop).toBe(true);
+  });
+
+  test('the open menu is above the notice and the bar, and Close is tappable', async ({ page, isMobile }) => {
+    test.skip(!isMobile, 'the menu button only exists on phones');
+    await page.goto('/');
+    await page.getByRole('button', { name: /^menu$/i }).click();
+    const dialog = page.getByRole('dialog', { name: /site navigation/i });
+    await expect(dialog).toBeVisible();
+    await expect(page.getByTestId('action-bar')).toBeHidden();
+    const close = dialog.getByRole('button', { name: /^close$/i });
+    const c = (await close.boundingBox())!;
+    const hit = await page.evaluate(
+      ([x, y]) => document.elementFromPoint(x, y)?.closest('button')?.textContent?.trim() ?? '',
+      [c.x + c.width / 2, c.y + c.height / 2],
+    );
+    expect(hit).toBe('Close');
+    await close.click();
+    await expect(dialog).toBeHidden();
+    await expect(page.getByTestId('action-bar')).toBeVisible();
+  });
+
+  test('the checklist still lists what Alex owes while samples stand in', async ({ page }) => {
+    await page.goto('/preview');
+    const needs = page.locator('#needs');
+    await expect(needs).toContainText(/phone number/i);
+    await expect(needs).toContainText(/email/i);
+    await expect(needs).toContainText(/hours/i);
+    await expect(needs).toContainText(/insurance/i);
+  });
+
+  test('the sample form still confirms in place after client-side navigation, and never POSTs', async ({ page }) => {
+    const posts: string[] = [];
+    page.on('request', (req) => { if (req.method() === 'POST') posts.push(req.url()); });
+    await page.goto('/contact');
+    await page.getByRole('link', { name: /^about$/i }).first().click();
+    await expect(page).toHaveURL(/\/about$/);
+    await page.getByRole('link', { name: /^contact$/i }).first().click();
+    await expect(page).toHaveURL(/\/contact$/);
+    await page.getByLabel('Your name').fill('Sample Customer');
+    await page.getByLabel('Email').fill('sample@example.com');
+    await page.getByRole('button', { name: /send request/i }).click();
+    await expect(page.getByTestId('quote-sample-sent')).toBeVisible();
+    expect(posts).toEqual([]);
+  });
+
+  test('sampled credentials say they are samples where they appear', async ({ page }) => {
+    await page.goto('/');
+    const proof = page.getByRole('region', { name: /proof at a glance/i });
+    await expect(proof).toContainText(/insured \(sample\)/i);
+  });
+});

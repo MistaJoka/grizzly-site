@@ -1,7 +1,8 @@
 ---
 // Phone-only bar pinned to the bottom edge: the thumb zone (Fitts's law). Call and Text appear only
 // when a phone is configured; Quote is the single bloom-coloured action on the screen. Hidden on
-// desktop, where the header carries the same links. z-40 keeps it under the menu dialog (z-50).
+// desktop, where the header carries the same links. z-80 puts it above every sheet (z ≤ 70); the menu
+// dialog (z-90, body level) sits above it, and global.css hides the bar while the menu is open.
 import { withBase } from '../../lib/url';
 import siteConfig from '../../../site.config';
 import { smsHref } from '../../lib/quote';
@@ -21,7 +22,7 @@ const quote = quoteHref.startsWith('#') ? quoteHref : withBase(quoteHref);
 <nav
   aria-label="Quick actions"
   data-testid="action-bar"
-  class={`fixed inset-x-0 bottom-0 z-40 grid ${cols} border-t border-paper/10 bg-canopy-deep pb-[env(safe-area-inset-bottom)] text-paper shadow-[0_-0.5rem_1.5rem_-0.75rem_rgb(15_42_31/0.6)] md:hidden`}
+  class={`fixed inset-x-0 bottom-0 z-[80] grid ${cols} border-t border-paper/10 bg-canopy-deep pb-[env(safe-area-inset-bottom)] text-paper shadow-[0_-0.5rem_1.5rem_-0.75rem_rgb(15_42_31/0.6)] md:hidden`}
 >
   {hasPhone && (
     <a href={business.phoneHref} class={`${segment} hover:bg-canopy`}>

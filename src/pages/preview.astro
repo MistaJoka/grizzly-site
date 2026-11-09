@@ -3,7 +3,7 @@
 // wherever customers meet it. Not in the nav or the sitemap, always noindex.
 // Delete this page when the site goes live on its own domain.
 import { getCollection } from 'astro:content';
-import siteConfig, { missingConfig } from '../../site.config';
+import siteConfig, { missingConfig, realConfig } from '../../site.config';
 import PageLayout from '../layouts/PageLayout.astro';
 import Container from '../components/primitives/Container.astro';
 import Eyebrow from '../components/primitives/Eyebrow.astro';
@@ -16,7 +16,7 @@ const services = await getCollection('services');
 const areas = (await getCollection('areas')).sort((a, b) => a.data.order - b.data.order);
 
 const domain = siteConfig.site.url ? new URL(siteConfig.site.url).host : '';
-const missing = missingConfig(siteConfig);
+const missing = missingConfig(realConfig); // the real blanks, even while demo samples stand in
 const lacks = (prefix: string) => missing.some((key) => key.startsWith(prefix));
 
 const ready = [

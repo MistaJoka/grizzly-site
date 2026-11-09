@@ -215,17 +215,24 @@ const label = 'block text-[length:var(--step--1)] font-semibold';
   </Container>
 
 <script>
-  // Demo mode only: the sample form confirms in place and never leaves the page.
-  const form = document.querySelector<HTMLFormElement>('form[data-demo]');
-  const done = document.querySelector<HTMLElement>('[data-testid="quote-sample-sent"]');
-  if (form && done) {
-    form.addEventListener('submit', (event) => {
+  // Demo mode only: the sample form confirms in place and never leaves the page. One delegated,
+  // capture-phase listener on the document, so it also covers forms swapped in by the router.
+  document.addEventListener(
+    'submit',
+    (event) => {
+      const form = event.target instanceof HTMLFormElement && event.target.matches('form[data-demo]') ? event.target : null;
+      if (!form) return;
       event.preventDefault();
+      event.stopImmediatePropagation();
       if (!form.reportValidity()) return;
+      const done = document.querySelector<HTMLElement>('[data-testid="quote-sample-sent"]');
       form.hidden = true;
-      done.hidden = false;
-      done.focus();
-    });
-  }
+      if (done) {
+        done.hidden = false;
+        done.focus();
+      }
+    },
+    true,
+  );
 </script>
 </PageLayout>

@@ -20,7 +20,7 @@ export default defineConfig({
     { name: 'mobile', use: { ...devices['Pixel 7'] } },
   ],
   webServer: {
-    command: `npm run dev -- --port ${port} --force`, // see playwright.config.ts
+    command: `npm run dev -- --port ${port} --ignore-lock`, // see playwright.config.ts
     url: origin,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

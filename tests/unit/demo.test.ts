@@ -66,6 +66,10 @@ describe('sample content is labelled and free of fabricated numbers', () => {
     expect(JSON.stringify(DEMO_BEFORE_AFTER)).not.toMatch(FABRICATION);
   });
 
+  it('labels every sampled credential inline, since the strip shows it as proof', () => {
+    for (const value of Object.values(SAMPLE.credentials)) expect(value).toMatch(/\(sample\)$/);
+  });
+
   it('describes the before/after pair as illustrations', () => {
     expect(DEMO_BEFORE_AFTER.beforeImage).toBe('/images/demo/forty-trees-before.jpg');
     expect(DEMO_BEFORE_AFTER.afterImage).toBe('/images/demo/forty-trees-after.jpg');

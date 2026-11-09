@@ -4,6 +4,7 @@ import { ClientRouter } from 'astro:transitions';
 import Footer from '../components/layout/Footer.astro';
 import Header from '../components/layout/Header.astro';
 import MobileActionBar from '../components/layout/MobileActionBar.astro';
+import MobileMenuPanel from '../components/layout/MobileMenuPanel.astro';
 import SampleNotice from '../components/layout/SampleNotice.astro';
 import SkipLink from '../components/layout/SkipLink.astro';
 import JsonLd from '../components/seo/JsonLd.astro';
@@ -70,6 +71,7 @@ const schema = [localBusinessJsonLd(Astro.site, siteConfig, SERVED_AREAS, offere
     </div>
     <Footer padForActionBar={actionBar} />
     {actionBar && <MobileActionBar quoteHref={quoteHref} />}
+    <MobileMenuPanel />
     <script>import '../lib/motion.ts';</script>
   </body>
 </html>
