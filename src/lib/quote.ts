@@ -49,3 +49,13 @@ export function quoteActionUrl(raw: string): string {
   const base = quotePageUrl(raw);
   return base ? `${base}/send` : '';
 }
+
+/**
+ * Which quote form the contact page renders. A configured Groundwork URL always wins; with none, a
+ * demo build (DEMO_DATA=1) shows the same form confirming in-page without sending anything; otherwise
+ * the page explains the form is being set up.
+ */
+export function quoteMode(groundworkUrl: string, demo: boolean): 'hosted' | 'sample' | 'none' {
+  if (quotePageUrl(groundworkUrl)) return 'hosted';
+  return demo ? 'sample' : 'none';
+}

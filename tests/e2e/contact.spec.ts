@@ -59,3 +59,13 @@ test('the page links to the hosted form and invents no phone or email', async ({
   await expect(page.getByRole('link', { name: /open it here/i })).toHaveAttribute('href', 'https://quotes.example.test/r/grizzly-test');
   await expect(page.locator('a[href^="tel:"], a[href^="mailto:"]')).toHaveCount(0);
 });
+
+test('tells the visitor the form takes about a minute before they start', async ({ page }) => {
+  await page.goto('/contact');
+  const hint = page.getByTestId('form-hint');
+  await expect(hint).toBeVisible();
+  await expect(hint).toContainText(/about a minute/i);
+  const hintBox = (await hint.boundingBox())!;
+  const formBox = (await page.getByTestId('quote-form').boundingBox())!;
+  expect(hintBox.y).toBeLessThan(formBox.y + 1);
+});

@@ -3,6 +3,9 @@ import { withBase } from '../lib/url';
 import { ClientRouter } from 'astro:transitions';
 import Footer from '../components/layout/Footer.astro';
 import Header from '../components/layout/Header.astro';
+import MobileActionBar from '../components/layout/MobileActionBar.astro';
+import MobileMenuPanel from '../components/layout/MobileMenuPanel.astro';
+import SampleNotice from '../components/layout/SampleNotice.astro';
 import SkipLink from '../components/layout/SkipLink.astro';
 import JsonLd from '../components/seo/JsonLd.astro';
 import Meta from '../components/seo/Meta.astro';
@@ -24,8 +27,12 @@ interface Props {
   noindex?: boolean;
   transparentHeader?: boolean;
   jsonLd?: object | object[];
+  /** The phone-only Call / Text / Quote bar. Off for the private preview and the 404 page. */
+  actionBar?: boolean;
+  /** Where the bar's Quote link goes (the contact page points at its own form). */
+  quoteHref?: string;
 }
-const { title, description, ogImage, noindex, transparentHeader = false, jsonLd } = Astro.props;
+const { title, description, ogImage, noindex, transparentHeader = false, jsonLd, actionBar = true, quoteHref } = Astro.props;
 
 // Until a real SITE_URL is configured the site must not be indexed.
 const holdBack = !isLive(siteConfig);
@@ -55,9 +62,16 @@ const schema = [localBusinessJsonLd(Astro.site, siteConfig, SERVED_AREAS, offere
   </head>
   <body class="min-h-dvh">
     <SkipLink />
-    <Header transparent={transparentHeader} />
-    <main id="main"><slot /></main>
-    <Footer />
+    <SampleNotice />
+    <!-- The wrapper is the containing block for the absolute (transparent) header, so the header
+         always starts where the notice ends, whatever height the notice wraps to. -->
+    <div class="relative">
+      <Header transparent={transparentHeader} />
+      <main id="main"><slot /></main>
+    </div>
+    <Footer padForActionBar={actionBar} />
+    {actionBar && <MobileActionBar quoteHref={quoteHref} />}
+    <MobileMenuPanel />
     <script>import '../lib/motion.ts';</script>
   </body>
 </html>

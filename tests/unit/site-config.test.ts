@@ -1,7 +1,33 @@
 import { describe, expect, it } from 'vitest';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import siteConfig, { credentialList, isLive, missingConfig, type SiteConfig } from '../../site.config';
+import siteConfig, { assertDemoSafe, credentialList, isDemo, isLive, missingConfig, realConfig, type SiteConfig } from '../../site.config';
+import { applyDemo } from '../../src/lib/demo';
+
+const siteWith = (over: Partial<SiteConfig['site']>): SiteConfig['site'] => ({
+  url: '', basePath: '', holdBack: '', demo: '', demoAllowIndexable: '', verification: { google: '', bing: '' }, ...over,
+});
+
+describe('demo mode boundary', () => {
+  it('is off unless DEMO_DATA is set', () => {
+    expect(isDemo({ ...realConfig, site: siteWith({}) })).toBe(false);
+    expect(isDemo({ ...realConfig, site: siteWith({ demo: '1' }) })).toBe(true);
+  });
+
+  it('still reports what Alex owes when sample values are standing in', () => {
+    expect(missingConfig(applyDemo(realConfig))).not.toEqual(missingConfig(realConfig));
+    expect(missingConfig()).toEqual(missingConfig(realConfig));
+    expect(missingConfig()).toEqual(expect.arrayContaining(['business.phone', 'business.email', 'business.hours']));
+  });
+
+  it('refuses a demo build that search engines could index', () => {
+    const indexable: SiteConfig = { ...realConfig, site: siteWith({ demo: '1', url: 'https://example.com' }) };
+    expect(() => assertDemoSafe(indexable)).toThrow(/DEMO_DATA/);
+    expect(() => assertDemoSafe({ ...indexable, site: siteWith({ demo: '1', url: 'https://example.com', holdBack: '1' }) })).not.toThrow();
+    expect(() => assertDemoSafe({ ...indexable, site: siteWith({ demo: '1', url: 'https://example.com', demoAllowIndexable: '1' }) })).not.toThrow();
+    expect(() => assertDemoSafe({ ...indexable, site: siteWith({ url: 'https://example.com' }) })).not.toThrow();
+  });
+});
 
 describe('siteConfig', () => {
   it('carries the verified public facts', () => {
@@ -35,7 +61,7 @@ describe('siteConfig', () => {
 
 describe('unknown values are empty placeholders, not invented', () => {
   it('reports every empty value through missingConfig', () => {
-    const empty = missingConfig({ ...siteConfig, site: { url: '', basePath: '', holdBack: '', verification: { google: '', bing: '' } }, quote: { groundworkQuoteUrl: '' } });
+    const empty = missingConfig({ ...siteConfig, site: siteWith({}), quote: { groundworkQuoteUrl: '' } });
     expect(empty).toEqual(expect.arrayContaining(['business.phone', 'business.email', 'business.credentials.generalLiability']));
     expect(empty).toContain('site.url (SITE_URL)');
     expect(empty).toContain('quote.groundworkQuoteUrl (GROUNDWORK_QUOTE_URL)');
@@ -51,12 +77,12 @@ describe('unknown values are empty placeholders, not invented', () => {
   });
 
   it('treats the site as not live until a URL is configured', () => {
-    expect(isLive({ ...siteConfig, site: { url: '', basePath: '', holdBack: '', verification: { google: '', bing: '' } } })).toBe(false);
-    expect(isLive({ ...siteConfig, site: { url: 'https://example.com', basePath: '', holdBack: '', verification: { google: '', bing: '' } } })).toBe(true);
+    expect(isLive({ ...siteConfig, site: siteWith({}) })).toBe(false);
+    expect(isLive({ ...siteConfig, site: siteWith({ url: 'https://example.com' }) })).toBe(true);
   });
 
   it('keeps a staging build with HOLD_BACK set out of search even with a real URL', () => {
-    expect(isLive({ ...siteConfig, site: { url: 'https://example.com', basePath: '', holdBack: '1', verification: { google: '', bing: '' } } })).toBe(false);
+    expect(isLive({ ...siteConfig, site: siteWith({ url: 'https://example.com', holdBack: '1' }) })).toBe(false);
   });
 });
 

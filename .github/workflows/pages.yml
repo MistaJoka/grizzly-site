@@ -31,6 +31,8 @@ jobs:
           SITE_URL: ${{ vars.SITE_URL }}
           # HOLD_BACK=1 => real URLs but still noindex (staging). Delete the variable to go live.
           HOLD_BACK: ${{ vars.HOLD_BACK }}
+          # DEMO_DATA=1 => labelled sample values fill Alex's blanks (requires HOLD_BACK). Delete before launch.
+          DEMO_DATA: ${{ vars.DEMO_DATA }}
           GROUNDWORK_QUOTE_URL: ${{ vars.GROUNDWORK_QUOTE_URL }}
           # Search Console / Bing ownership tokens (HTML-tag method). Unset => no tag.
           GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}

@@ -38,7 +38,8 @@ test.describe('mobile menu', () => {
     const toggle = page.locator('header').getByRole('button', { name: /^menu$/i });
     await toggle.click();
 
-    const dialog = page.locator('header').getByRole('dialog', { name: /navigation/i });
+    // The dialog is rendered at body level (above every sheet and the phone action bar), not inside the header.
+    const dialog = page.getByRole('dialog', { name: /navigation/i });
     await expect(dialog).toBeVisible();
 
     await page.keyboard.press('Escape');
@@ -49,7 +50,7 @@ test.describe('mobile menu', () => {
   test('navigates from the mobile menu', async ({ page }) => {
     await page.goto('/');
     await page.locator('header').getByRole('button', { name: /^menu$/i }).click();
-    await page.locator('header').getByRole('dialog').getByRole('link', { name: 'Services' }).click();
+    await page.getByRole('dialog', { name: /navigation/i }).getByRole('link', { name: 'Services' }).click();
     await expect(page).toHaveURL(/\/services\/?$/);
   });
 });
@@ -58,4 +59,16 @@ test('an unknown URL renders the 404 page', async ({ page }) => {
   const response = await page.goto('/this-page-does-not-exist');
   expect(response?.status()).toBe(404);
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+});
+
+test.describe('mobile menu survives client-side navigation', () => {
+  test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  test('still opens after the router swaps the page', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('header').getByRole('button', { name: /^menu$/i }).click();
+    await page.getByRole('dialog', { name: /site navigation/i }).getByRole('link', { name: /^about$/i }).click();
+    await expect(page).toHaveURL(/\/about$/);
+    await page.locator('header').getByRole('button', { name: /^menu$/i }).click();
+    await expect(page.getByRole('dialog', { name: /site navigation/i })).toBeVisible();
+  });
 });

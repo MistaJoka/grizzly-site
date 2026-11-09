@@ -1,5 +1,6 @@
 ---
-import siteConfig, { credentialList } from '../../site.config';
+import siteConfig, { credentialList, isDemo } from '../../site.config';
+import { SAMPLE_TESTIMONIALS } from '../lib/demo';
 import { getCollection } from 'astro:content';
 import PageLayout from '../layouts/PageLayout.astro';
 import Container from '../components/primitives/Container.astro';
@@ -8,7 +9,11 @@ import ClosingCTA from '../components/sections/ClosingCTA.astro';
 import { breadcrumbJsonLd } from '../lib/schema';
 import { canonical } from '../lib/seo';
 
-const testimonials = (await getCollection('testimonials')).sort((a, b) => a.data.order - b.data.order);
+const real = (await getCollection('testimonials')).sort((a, b) => a.data.order - b.data.order);
+// Real, permissioned reviews when they exist; labelled samples only in demo mode.
+const testimonials = real.length > 0
+  ? real.map((t) => ({ quote: t.data.quote, attribution: t.data.attribution, town: t.data.town }))
+  : isDemo() ? SAMPLE_TESTIMONIALS : [];
 const years = new Date().getFullYear() - siteConfig.business.foundedYear;
 
 const jsonLd = breadcrumbJsonLd([
@@ -69,9 +74,9 @@ const jsonLd = breadcrumbJsonLd([
           {testimonials.map((testimonial) => (
             <li class="reveal border-t border-stone pt-6">
               <figure>
-                <blockquote class="text-[length:var(--step-1)]">&ldquo;{testimonial.data.quote}&rdquo;</blockquote>
+                <blockquote class="text-[length:var(--step-1)]">&ldquo;{testimonial.quote}&rdquo;</blockquote>
                 <figcaption class="mt-4 text-[length:var(--step--1)] text-ink-muted">
-                  {testimonial.data.attribution}, {testimonial.data.town}
+                  {testimonial.attribution}, {testimonial.town}
                 </figcaption>
               </figure>
             </li>

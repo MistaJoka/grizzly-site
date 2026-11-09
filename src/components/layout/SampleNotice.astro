@@ -1,0 +1,18 @@
+---
+// Demo mode only: one quiet line above the header saying which details are stand-ins.
+// Cream (--haze) is the site's "not final" tone; it is not a warning colour.
+import { withBase } from '../../lib/url';
+import siteConfig, { isDemo } from '../../../site.config';
+
+const show = isDemo();
+const first = siteConfig.business.operator.split(' ')[0];
+---
+{show && (
+  <p
+    data-testid="sample-notice"
+    class="bg-[var(--haze)] px-6 py-2.5 text-center text-[length:var(--step--1)] leading-snug text-ink md:px-10"
+  >
+    Preview with sample details. Phone, email, hours, insurance wording and reviews are placeholders until {first} confirms them.
+    <a href={withBase('/preview#needs')} class="ml-2 whitespace-nowrap font-semibold text-moss underline underline-offset-4 hover:text-moss-deep">What {first} supplies</a>
+  </p>
+)}

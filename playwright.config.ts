@@ -20,7 +20,9 @@ export default defineConfig({
     { name: 'mobile', use: { ...devices['Pixel 7'] } },
   ],
   webServer: {
-    command: `npm run dev -- --port ${port}`,
+    // --ignore-lock starts this server alongside any other `astro dev` for this repo (a stale lock, or another
+    // session's live server) without touching it. Never the replace flag: that kills whatever holds the lock.
+    command: `npm run dev -- --port ${port} --ignore-lock`,
     url: origin,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

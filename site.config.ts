@@ -8,6 +8,8 @@
 //  - Only put facts here that Alex has confirmed. Do not copy third-party marketplace
 //    photos, reviews or ratings (non-solicit / marketing rule in the growth plan).
 
+import { applyDemo } from './src/lib/demo';
+
 export interface NavItem { label: string; href: string; }
 
 export interface SiteConfig {
@@ -51,6 +53,14 @@ export interface SiteConfig {
      */
     holdBack: string;
     /**
+     * Demo switch. DEMO_DATA=1 fills every still-empty value with a labelled sample from src/lib/demo.ts
+     * and shows a "sample details" notice on every page. Only allowed on a build that is not indexable
+     * (no SITE_URL, or HOLD_BACK set); DEMO_ALLOW_INDEXABLE=1 lifts that for CI's Lighthouse run only.
+     * Env: DEMO_DATA, DEMO_ALLOW_INDEXABLE
+     */
+    demo: string;
+    demoAllowIndexable: string;
+    /**
      * Optional search-engine ownership tokens, emitted as <meta> tags only when set.
      * Env: GOOGLE_SITE_VERIFICATION (Search Console, HTML-tag method), BING_SITE_VERIFICATION (Webmaster Tools).
      */
@@ -73,7 +83,8 @@ export interface SiteConfig {
 const env = (key: string): string =>
   (typeof process !== 'undefined' && process.env?.[key] ? String(process.env[key]) : '').trim();
 
-const siteConfig: SiteConfig = {
+/** The facts as Alex has (or has not) supplied them. Empty strings are omitted from the site. */
+export const realConfig: SiteConfig = {
   business: {
     name: 'Grizzly Lawn Care',
     legalName: 'Grizzly Lawn Care, LLC',
@@ -101,6 +112,10 @@ const siteConfig: SiteConfig = {
     url: env('SITE_URL'), // TODO(Alex): set the real domain
     basePath: env('BASE_PATH'),
     holdBack: env('HOLD_BACK'),
+    demo: env('DEMO_DATA'),
+    // Read outside env() on purpose: env() keys are forwarded by the deploy workflow, and this one must
+    // never be. It exists for CI's Lighthouse run against a demo build.
+    demoAllowIndexable: (typeof process !== 'undefined' && process.env.DEMO_ALLOW_INDEXABLE ? '1' : ''),
     verification: { google: env('GOOGLE_SITE_VERIFICATION'), bing: env('BING_SITE_VERIFICATION') },
   },
   quote: {
@@ -123,10 +138,29 @@ const siteConfig: SiteConfig = {
   },
 };
 
+/** Demo mode: DEMO_DATA is set, so sample values stand in for the blanks (see src/lib/demo.ts). */
+export function isDemo(config: SiteConfig = realConfig): boolean {
+  return config.site.demo.length > 0;
+}
+
+/** A demo build must never be indexable: sample values would reach search engines as facts. */
+export function assertDemoSafe(config: SiteConfig = realConfig): void {
+  if (isDemo(config) && isLive(config) && !config.site.demoAllowIndexable) {
+    throw new Error(
+      'DEMO_DATA is set on an indexable build (SITE_URL without HOLD_BACK). Sample values must not be indexed: set HOLD_BACK=1, unset DEMO_DATA, or set DEMO_ALLOW_INDEXABLE=1 for a local audit.',
+    );
+  }
+}
+
+assertDemoSafe(realConfig);
+
+/** What the site renders: the real facts, with labelled samples filling the blanks in demo mode. */
+const siteConfig: SiteConfig = isDemo(realConfig) ? applyDemo(realConfig) : realConfig;
+
 export default siteConfig;
 
-/** Dotted paths of every still-empty TODO value. Used by `npm run check:config`. */
-export function missingConfig(config: SiteConfig = siteConfig): string[] {
+/** Dotted paths of every still-empty TODO value, judged on the real facts even in demo mode. Used by `npm run check:config`. */
+export function missingConfig(config: SiteConfig = realConfig): string[] {
   const missing: string[] = [];
   const { business: b } = config;
   for (const key of ['phone', 'phoneHref', 'email'] as const) if (!b[key]) missing.push(`business.${key}`);

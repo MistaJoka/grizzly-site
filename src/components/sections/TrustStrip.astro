@@ -1,0 +1,17 @@
+---
+// Verifiable proof directly under the promise, before the first ask: the LLC record, the owner
+// promise, a supplied credential, the towns served. One quiet row, read in a glance; the first and
+// last chips carry the strongest facts (serial-position effect). Not a card grid, not a sequence.
+interface Props { items: string[] }
+const { items } = Astro.props;
+---
+<section id="proof" aria-label="Proof at a glance" class="sheet z-10 bg-paper-raised">
+  <ul class="mx-auto flex w-full max-w-[var(--container)] flex-wrap gap-x-8 gap-y-2.5 px-6 pb-[calc(var(--radius-sheet)+1.5rem)] pt-7 text-[length:var(--step--1)] text-ink md:px-10">
+    {items.map((item) => (
+      <li class="flex items-center gap-2.5">
+        <svg aria-hidden="true" viewBox="0 0 20 20" class="h-4 w-4 shrink-0 text-moss" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5l4 4 8-9" /></svg>
+        <span>{item}</span>
+      </li>
+    ))}
+  </ul>
+</section>

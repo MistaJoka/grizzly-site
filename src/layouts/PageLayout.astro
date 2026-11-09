@@ -10,10 +10,12 @@ interface Props {
   ogImage?: string;
   noindex?: boolean;
   jsonLd?: object | object[];
+  actionBar?: boolean;
+  quoteHref?: string;
 }
-const { title, eyebrow, lede, description, ogImage, noindex, jsonLd } = Astro.props;
+const { title, eyebrow, lede, description, ogImage, noindex, jsonLd, actionBar, quoteHref } = Astro.props;
 ---
-<BaseLayout title={title} description={description} ogImage={ogImage} noindex={noindex} jsonLd={jsonLd}>
+<BaseLayout title={title} description={description} ogImage={ogImage} noindex={noindex} jsonLd={jsonLd} actionBar={actionBar} quoteHref={quoteHref}>
   <PageHero title={title} eyebrow={eyebrow} lede={lede} />
   <div class="sheet z-10 bg-paper pt-16 md:pt-24">
     <slot />

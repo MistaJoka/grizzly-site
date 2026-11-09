@@ -16,6 +16,20 @@ test('the hero offers a primary CTA and invents no phone number', async ({ page 
   await expect(page.locator('a[href^="tel:"]')).toHaveCount(0);
 });
 
+test('shows verifiable proof directly under the hero', async ({ page }) => {
+  await page.goto('/');
+  const proof = page.getByRole('region', { name: /proof at a glance/i });
+  await expect(proof).toHaveCount(1);
+  // Nothing supplied yet: the LLC record, the owner promise and the town count. No invented credential.
+  await expect(proof.getByRole('listitem')).toHaveCount(3);
+  await expect(proof).toContainText('L21000330992');
+  const hero = await page.getByRole('region', { name: /hero/i }).boundingBox();
+  const strip = await proof.boundingBox();
+  const services = await page.getByRole('region', { name: /what we do/i }).boundingBox();
+  expect(strip!.y).toBeGreaterThanOrEqual(hero!.y + hero!.height - 80);
+  expect(strip!.y).toBeLessThan(services!.y);
+});
+
 test('lists all five services within the second viewport', async ({ page }) => {
   await page.goto('/');
   const strip = page.getByRole('region', { name: /what we do/i });
@@ -35,7 +49,7 @@ test('every service card links to its own page', async ({ page }) => {
 
 test('presents the full narrative in order', async ({ page }) => {
   await page.goto('/');
-  for (const name of [/hero/i, /what we do/i, /how it works/i, /commercial and hoa/i, /why us/i, /service area/i, /get started/i]) {
+  for (const name of [/hero/i, /proof at a glance/i, /what we do/i, /how it works/i, /commercial and hoa/i, /why us/i, /service area/i, /get started/i]) {
     await expect(page.getByRole('region', { name })).toHaveCount(1);
   }
 });

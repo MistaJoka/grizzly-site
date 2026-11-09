@@ -4,6 +4,11 @@ import { getCollection } from 'astro:content';
 import siteConfig from '../../../site.config';
 import Mark from '../primitives/Mark.astro';
 
+interface Props {
+  /** Leave room under the last line for the phone-only action bar (3.5rem + safe area). */
+  padForActionBar?: boolean;
+}
+const { padForActionBar = true } = Astro.props;
 const areas = (await getCollection('areas')).sort((a, b) => a.data.order - b.data.order);
 const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
 const year = new Date().getFullYear();
@@ -64,7 +69,7 @@ const { business } = siteConfig;
     </div>
   </div>
 
-  <div class="mx-auto w-full max-w-[var(--container)] px-6 pb-10 text-[length:var(--step--1)] opacity-60 md:px-10">
-    &copy; {year} {business.legalName}. All rights reserved.
+  <div class={`mx-auto w-full max-w-[var(--container)] px-6 text-[length:var(--step--1)] opacity-60 md:px-10 md:pb-10 ${padForActionBar ? 'pb-[calc(2.5rem+3.5rem+env(safe-area-inset-bottom))]' : 'pb-10'}`}>
+    <p>&copy; {year} {business.legalName}. All rights reserved.</p>
   </div>
 </footer>

@@ -1,0 +1,40 @@
+---
+// Phone-only bar pinned to the bottom edge: the thumb zone (Fitts's law). Call and Text appear only
+// when a phone is configured; Quote is the single bloom-coloured action on the screen. Hidden on
+// desktop, where the header carries the same links. z-80 puts it above every sheet (z ≤ 70); the menu
+// dialog (z-90, body level) sits above it, and global.css hides the bar while the menu is open.
+import { withBase } from '../../lib/url';
+import siteConfig from '../../../site.config';
+import { smsHref } from '../../lib/quote';
+
+interface Props {
+  /** Where "Quote" goes. The contact page passes "#quote-form"; everywhere else it is the contact page. */
+  quoteHref?: string;
+}
+const { quoteHref = '/contact' } = Astro.props;
+const { business } = siteConfig;
+const hasPhone = Boolean(business.phone && business.phoneHref);
+const text = hasPhone ? smsHref(business.phoneHref) : '';
+const cols = hasPhone ? (text ? 'grid-cols-3' : 'grid-cols-2') : 'grid-cols-1';
+const segment = 'flex min-h-14 items-center justify-center gap-2 text-[length:var(--step-0)] font-semibold';
+const quote = quoteHref.startsWith('#') ? quoteHref : withBase(quoteHref);
+---
+<nav
+  aria-label="Quick actions"
+  data-testid="action-bar"
+  class={`fixed inset-x-0 bottom-0 z-[80] grid ${cols} border-t border-paper/10 bg-canopy-deep pb-[env(safe-area-inset-bottom)] text-paper shadow-[0_-0.5rem_1.5rem_-0.75rem_rgb(15_42_31/0.6)] md:hidden`}
+>
+  {hasPhone && (
+    <a href={business.phoneHref} class={`${segment} hover:bg-canopy`}>
+      <svg aria-hidden="true" viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z" /></svg>
+      Call
+    </a>
+  )}
+  {hasPhone && text && (
+    <a href={text} class={`${segment} border-l border-paper/10 hover:bg-canopy`}>
+      <svg aria-hidden="true" viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z" /></svg>
+      Text
+    </a>
+  )}
+  <a href={quote} class={`${segment} bg-bloom text-paper-raised hover:bg-bloom-deep`}>Quote</a>
+</nav>
