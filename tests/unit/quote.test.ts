@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { GROUNDWORK_FIELDS, GROUNDWORK_LIMITS, HEARD_VIA, quoteActionUrl, quotePageUrl, smsHref } from '../../src/lib/quote';
+import { GROUNDWORK_FIELDS, GROUNDWORK_LIMITS, HEARD_VIA, quoteActionUrl, quoteMode, quotePageUrl, smsHref } from '../../src/lib/quote';
 
 describe('quote URL handling', () => {
   it('returns empty when unconfigured or invalid', () => {
@@ -41,5 +41,19 @@ describe('HEARD_VIA', () => {
   it('only offers values Groundwork keeps', () => {
     const groundwork = ['google', 'social', 'nextdoor', 'website', 'sign', 'referral', 'other'];
     expect(HEARD_VIA.map(([value]) => value)).toEqual(groundwork);
+  });
+});
+
+describe('quoteMode', () => {
+  it('uses the hosted Groundwork form whenever a URL is configured, demo or not', () => {
+    expect(quoteMode('https://quotes.example.test/r/grizzly', true)).toBe('hosted');
+    expect(quoteMode('https://quotes.example.test/r/grizzly', false)).toBe('hosted');
+  });
+  it('falls back to the in-page sample confirmation only in demo mode', () => {
+    expect(quoteMode('', true)).toBe('sample');
+  });
+  it('shows no form when nothing is configured', () => {
+    expect(quoteMode('', false)).toBe('none');
+    expect(quoteMode('not a url', false)).toBe('none');
   });
 });

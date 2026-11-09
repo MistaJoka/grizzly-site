@@ -116,3 +116,26 @@ test.describe('sample proof', () => {
     }
   });
 });
+
+test.describe('sample quote form', () => {
+  test('confirms in the page and sends nothing anywhere', async ({ page }) => {
+    const outbound: string[] = [];
+    await page.route('**/*', async (route) => {
+      const url = route.request().url();
+      if (!url.startsWith(page.url().split('/').slice(0, 3).join('/')) && !url.startsWith('http://localhost')) outbound.push(url);
+      await route.continue();
+    });
+    await page.goto('/contact');
+    const form = page.getByTestId('quote-form');
+    await expect(form).toHaveAttribute('data-demo', '');
+    await expect(page.getByTestId('form-hint')).toBeVisible();
+    await page.getByLabel('Your name').fill('Sample Customer');
+    await page.getByLabel('Email').fill('sample@example.com');
+    await page.getByRole('button', { name: /send request/i }).click();
+    const status = page.getByTestId('quote-sample-sent');
+    await expect(status).toBeVisible();
+    await expect(status).toContainText(/sample/i);
+    await expect(form).toBeHidden();
+    expect(outbound).toEqual([]);
+  });
+});

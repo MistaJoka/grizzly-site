@@ -1,17 +1,18 @@
 ---
 import { getCollection } from 'astro:content';
-import siteConfig from '../../site.config';
+import siteConfig, { isDemo } from '../../site.config';
 import PageLayout from '../layouts/PageLayout.astro';
 import Container from '../components/primitives/Container.astro';
 import { breadcrumbJsonLd } from '../lib/schema';
 import { canonical } from '../lib/seo';
 import { withBase } from '../lib/url';
-import { GROUNDWORK_FIELDS as F, GROUNDWORK_LIMITS as L, HEARD_VIA, quoteActionUrl, quotePageUrl, smsHref } from '../lib/quote';
+import { GROUNDWORK_FIELDS as F, GROUNDWORK_LIMITS as L, HEARD_VIA, quoteActionUrl, quoteMode, quotePageUrl, smsHref } from '../lib/quote';
 
 const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
 const areas = (await getCollection('areas')).sort((a, b) => a.data.order - b.data.order);
 
-const action = quoteActionUrl(siteConfig.quote.groundworkQuoteUrl);
+const mode = quoteMode(siteConfig.quote.groundworkQuoteUrl, isDemo());
+const action = mode === 'hosted' ? quoteActionUrl(siteConfig.quote.groundworkQuoteUrl) : '#quote-form';
 const hostedPage = quotePageUrl(siteConfig.quote.groundworkQuoteUrl);
 const { business } = siteConfig;
 const textHref = smsHref(business.phoneHref);
@@ -36,12 +37,16 @@ const label = 'block text-[length:var(--step--1)] font-semibold';
   lede="Tell us what you need and where. Add a phone number or an email so Alex can reach you, and a photo if it helps."
   description="Request a quote from Grizzly Lawn Care for lawn maintenance, trimming, mulching, pressure washing, or tree and plant installation in Miami-Dade."
   jsonLd={jsonLd}
-  quoteHref={action ? "#quote-form" : "/contact"}
+  quoteHref={mode !== 'none' ? "#quote-form" : "/contact"}
 >
   <Container class="pb-24">
     <div class="grid gap-16 md:grid-cols-[3fr_2fr]">
-      {action ? (
+      {mode !== 'none' ? (
         <div class="rounded-[var(--radius-media)] bg-paper-raised p-6 shadow-[var(--shadow-panel)] md:p-10">
+          <!-- Goal-gradient: say how short the path is before the first field. -->
+          <p data-testid="form-hint" class="mb-7 text-[length:var(--step-0)] text-ink-muted">
+            About a minute. Your name plus a phone or email is all we need.
+          </p>
           <!--
             Plain multipart form, no JavaScript. It posts to the hosted Groundwork route (/r/<slug>/send),
             which saves the request and redirects the browser to the hosted confirmation page.
@@ -53,6 +58,7 @@ const label = 'block text-[length:var(--step--1)] font-semibold';
             enctype="multipart/form-data"
             class="relative space-y-7"
             data-testid="quote-form"
+            data-demo={mode === 'sample' ? '' : undefined}
           >
             <div>
               <label class={label} for="name">Your name</label>
@@ -122,11 +128,29 @@ const label = 'block text-[length:var(--step--1)] font-semibold';
             >
               Send request
             </button>
-            <p class="text-[length:var(--step--1)] text-ink-muted">
-              Your request is sent to a secure page that confirms it. Limit: {L.ratePerHour} requests per hour from one connection.
-              Prefer the hosted form? <a class="text-moss underline underline-offset-4" href={hostedPage}>Open it here</a>.
-            </p>
+            {mode === 'hosted' ? (
+              <p class="text-[length:var(--step--1)] text-ink-muted">
+                Your request is sent to a secure page that confirms it. Limit: {L.ratePerHour} requests per hour from one connection.
+                Prefer the hosted form? <a class="text-moss underline underline-offset-4" href={hostedPage}>Open it here</a>.
+              </p>
+            ) : (
+              <p class="text-[length:var(--step--1)] text-ink-muted">
+                Sample form: nothing is sent. On the live site this request goes straight to {business.operator.split(' ')[0]}.
+              </p>
+            )}
           </form>
+          {mode === 'sample' && (
+            <div
+              role="status"
+              data-testid="quote-sample-sent"
+              tabindex="-1"
+              hidden
+              class="rounded-[var(--radius-panel)] border border-moss/30 bg-paper p-6 text-[length:var(--step-1)] leading-snug"
+            >
+              <p class="font-[family-name:var(--font-display)] text-[length:var(--step-3)]">Request received (sample).</p>
+              <p class="mt-3 text-ink-muted">On the live site this goes straight to {business.operator.split(' ')[0]}&rsquo;s phone and email, with your photos attached.</p>
+            </div>
+          )}
         </div>
       ) : (
         <div data-testid="quote-unavailable" class="relative self-start overflow-hidden rounded-[var(--radius-media)] bg-paper-raised p-8 shadow-[var(--shadow-panel)] md:p-10">
@@ -189,4 +213,19 @@ const label = 'block text-[length:var(--step--1)] font-semibold';
       </aside>
     </div>
   </Container>
+
+<script>
+  // Demo mode only: the sample form confirms in place and never leaves the page.
+  const form = document.querySelector<HTMLFormElement>('form[data-demo]');
+  const done = document.querySelector<HTMLElement>('[data-testid="quote-sample-sent"]');
+  if (form && done) {
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      form.hidden = true;
+      done.hidden = false;
+      done.focus();
+    });
+  }
+</script>
 </PageLayout>
