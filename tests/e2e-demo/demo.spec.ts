@@ -139,3 +139,12 @@ test.describe('sample quote form', () => {
     expect(outbound).toEqual([]);
   });
 });
+
+test.describe('preview page', () => {
+  test('the notice link lands on the checklist of what Alex supplies', async ({ page }) => {
+    await page.goto('/');
+    await page.getByTestId('sample-notice').getByRole('link').click();
+    await expect(page).toHaveURL(/\/preview#needs$/);
+    await expect(page.locator('#needs')).toHaveCount(1);
+  });
+});

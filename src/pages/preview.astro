@@ -40,6 +40,59 @@ const needs = [
   { label: 'A quick read-through', body: 'Check the services, the towns and the wording sound like you.', show: true },
 ].filter((item) => item.show);
 
+// Why the layout works: eight choices traced to attention and decision research, each with a place
+// on the site to see it. Plain English for Alex; the source names are for anyone who wants to check.
+const why = [
+  {
+    name: 'The first words carry the message',
+    plain: 'People skim a page in an F shape: across the top, then down the left edge. So every heading starts with its point, and the first screen says what we do and where.',
+    where: 'The home page headline', href: '/',
+    source: 'Nielsen Norman Group, “F-Shaped Pattern of Reading on the Web” (2017, reviewed Aug 2026)',
+  },
+  {
+    name: 'Proof sits right under the promise',
+    plain: 'A claim followed by something you can check, like the state company record and the towns served, is believed. The same claim with the proof at the bottom is not.',
+    where: 'The strip under the home page hero', href: '/#proof',
+    source: 'moda.app review of six landscaping sites (Sept 2026): Altizer Lawn & Landscape',
+  },
+  {
+    name: 'One colour means one thing',
+    plain: 'The pink is used for exactly one action: asking for a quote. Eyes find the odd one out, so the next step is never in doubt.',
+    where: 'Every “Request a quote” button', href: '/contact',
+    source: 'Von Restorff effect, Laws of UX',
+  },
+  {
+    name: 'Buttons live under the thumb',
+    plain: 'On a phone, Call, Text and Quote sit in a bar at the bottom of the screen, where a thumb already rests, and each is big enough to hit without aiming.',
+    where: 'Any page, on a phone', href: '/services',
+    source: 'Fitts’s law, Laws of UX; WCAG 2.2 target size (2.5.8)',
+  },
+  {
+    name: 'Two ways in, not ten',
+    plain: 'Someone with a problem today calls or texts. Someone planning ahead fills a short form. Fewer choices mean faster decisions.',
+    where: 'The contact page', href: '/contact',
+    source: 'Hick’s law, Laws of UX; home-service landing page studies (2026)',
+  },
+  {
+    name: 'Five services, named the way customers say them',
+    plain: 'Five cards, each named by the job a homeowner would describe out loud, not an internal menu. Short lists fit in working memory.',
+    where: 'The services page', href: '/services',
+    source: 'Miller’s law and the law of common region, Laws of UX; moda.app (Sept 2026)',
+  },
+  {
+    name: 'Real photos beat stock',
+    plain: 'People study photos of real work and skip decoration. Until we have your photos the site uses drawings that are clearly drawings, so nothing pretends.',
+    where: 'The work page', href: '/work',
+    source: 'Nielsen Norman Group, “Photos as Web Content” (2010, reviewed Aug 2026)',
+  },
+  {
+    name: 'End on the ask',
+    plain: 'People remember the high point and the ending. Every page closes with one clear request, and the phone number is the last thing in the footer.',
+    where: 'The closing section of the home page', href: '/#get-started',
+    source: 'Peak-end rule and serial-position effect, Laws of UX',
+  },
+];
+
 const sitelinks = [
   { label: 'Services', href: '/services' },
   { label: 'Commercial & HOA', href: '/commercial' },
@@ -168,8 +221,34 @@ const blank = 'rounded-md border border-dashed border-ink/30 px-2 text-ink-muted
     </section>
   </Container>
 
+  <!-- Why it works -->
+  <Container>
+    <section id="why" aria-labelledby="why-h" class="mt-28 md:mt-36">
+      <div class="max-w-[52ch]">
+        <Eyebrow>Why it works</Eyebrow>
+        <h2 id="why-h" class="mt-4 text-[length:var(--step-4)]">Built around how people actually look at a page.</h2>
+        <p class="mt-5 text-[length:var(--step-1)] text-ink-muted">
+          Eight choices on this site come from eye-tracking and decision research, not taste. Each one says where to see it.
+        </p>
+      </div>
+      <ul class="mt-12 grid gap-x-12 gap-y-10 md:grid-cols-2">
+        {why.map((item) => (
+          <li class="border-t border-ink/10 pt-5">
+            <h3 class="text-[length:var(--step-2)] leading-tight">{item.name}</h3>
+            <p class="mt-3 text-ink-muted">{item.plain}</p>
+            <p class="mt-4 text-[length:var(--step--1)]">
+              <span class="font-semibold">Where:</span>
+              <a href={withBase(item.href)} class="text-moss underline underline-offset-4 hover:text-moss-deep">{item.where}</a>
+            </p>
+            <p class="mt-1 text-[length:var(--step--1)] text-ink-muted"><cite class="not-italic">{item.source}</cite></p>
+          </li>
+        ))}
+      </ul>
+    </section>
+  </Container>
+
   <!-- Checklist -->
-  <section aria-labelledby="list-h" class="sheet z-20 bg-canopy pb-24 pt-20 text-paper md:pb-32 md:pt-28">
+  <section id="needs" aria-labelledby="list-h" class="sheet z-20 bg-canopy pb-24 pt-20 text-paper md:pb-32 md:pt-28">
     <Container>
       <h2 id="list-h" class="max-w-[20ch] text-[length:var(--step-5)]">What’s done, and what we need from you.</h2>
       <div class="mt-14 grid gap-12 md:grid-cols-2 md:gap-16">

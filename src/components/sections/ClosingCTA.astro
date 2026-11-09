@@ -8,7 +8,7 @@ const { headline, body } = Astro.props;
 const left = frond(-80, 860, -48, 620, -30, { leaflets: 30, leafLen: 190, leafWidth: 13, spread: 52 });
 const right = frond(1680, -60, 150, 640, 140, { leaflets: 30, leafLen: 200, leafWidth: 13, spread: 52 });
 ---
-<section aria-label="Get started" class="sheet z-[60] overflow-hidden bg-canopy py-28 text-paper md:py-40">
+<section id="get-started" aria-label="Get started" class="sheet z-[60] overflow-hidden bg-canopy py-28 text-paper md:py-40">
   <svg aria-hidden="true" focusable="false" viewBox="0 0 1600 800" preserveAspectRatio="xMidYMid slice" class="pointer-events-none absolute inset-0 h-full w-full">
     <path d={left} fill="var(--moss-deep)" />
     <path d={right} fill="var(--canopy-deep)" />
