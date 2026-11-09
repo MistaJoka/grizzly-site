@@ -12,6 +12,7 @@ import OfferingStrip from '../components/sections/OfferingStrip.astro';
 import ProcessSteps from '../components/sections/ProcessSteps.astro';
 import Proof from '../components/sections/Proof.astro';
 import ServiceAreaList from '../components/sections/ServiceAreaList.astro';
+import TrustStrip from '../components/sections/TrustStrip.astro';
 import { resolveImage } from '../lib/images';
 
 const byOrder = <T extends { data: { order: number } }>(a: T, b: T) => a.data.order - b.data.order;
@@ -39,6 +40,16 @@ const areas = (await getCollection('areas')).sort(byOrder).map((area) => ({
 const testimonials = (await getCollection('testimonials')).sort(byOrder);
 const lead = testimonials[0];
 
+// Proof chips: public record first, the owner promise, the first supplied credential (if any), reach last.
+const { business } = siteConfig;
+const firstCredential = Object.values(business.credentials).find(Boolean);
+const proof = [
+  `Florida LLC since ${business.foundedYear}, document ${business.floridaDocNumber}`,
+  'Owner on every job',
+  ...(firstCredential ? [firstCredential] : []),
+  `${areas.length} towns across Miami-Dade`,
+];
+
 const commercialArt = await resolveImage('/images/services/tree-plant-installation.jpg');
 
 const steps = [
@@ -53,6 +64,7 @@ const steps = [
     lede="Lawn maintenance, hedge trimming, mulching, pressure washing, and tree and plant installs for homes, HOAs and commercial properties."
     note={`Owned and run by ${siteConfig.business.operator} since ${siteConfig.business.foundedYear}. Alex quotes every job and is on site for every one.`}
   />
+  <TrustStrip items={proof} />
   <OfferingStrip services={services} />
   {withPhotos && (
     <BeforeAfter

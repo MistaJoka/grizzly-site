@@ -76,3 +76,12 @@ test.describe('mobile action bar', () => {
     await expect(page.getByTestId('action-bar')).toHaveCount(0);
   });
 });
+
+test.describe('trust strip', () => {
+  test('adds the first sample credential as a fourth chip', async ({ page }) => {
+    await page.goto('/');
+    const proof = page.getByRole('region', { name: /proof at a glance/i });
+    await expect(proof.getByRole('listitem')).toHaveCount(4);
+    await expect(proof).toContainText(/insured/i);
+  });
+});
