@@ -12,6 +12,7 @@
     "astro": "astro",
     "test:unit": "vitest run",
     "test:e2e": "playwright test",
+    "test:e2e:demo": "playwright test -c playwright.demo.config.ts --workers=1",
     "test": "npm run test:unit && SITE_URL=${SITE_URL:-http://localhost:4321} npm run build && SITE_URL=${SITE_URL:-http://localhost:4321} npm run test:seo && npm run test:e2e",
     "placeholders": "node scripts/generate-placeholders.mjs",
     "icons": "node scripts/generate-icons.mjs",
