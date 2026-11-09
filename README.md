@@ -69,6 +69,7 @@ Every push to `main` runs `.github/workflows/pages.yml`, which builds `dist/` an
 |---|---|---|
 | `SITE_URL` | `https://grizzlysite.andraewilliams.com` | Canonical, OG and sitemap URLs. Unset => noindex + `robots.txt: Disallow: /`. |
 | `HOLD_BACK` | `1` | Staging switch: real URLs but still noindex + Disallow. **Delete it to go live.** |
+| `DEMO_DATA` | `1` | Demo mode: labelled sample values (555 phone, `.example` email, sample hours/insurance wording/reviews, drawn before/after) fill Alex's blanks and a "sample details" notice shows on every page. Requires `HOLD_BACK` (the build refuses an indexable demo). **Delete it before launch.** |
 | `GROUNDWORK_QUOTE_URL` | unset | Hosted Groundwork `/r/<slug>` page; unset => contact page shows no form. |
 | `BASE_PATH` | unset | Only for a `github.io/<repo>` URL. Must stay unset on the custom domain. |
 
@@ -76,7 +77,7 @@ DNS: `grizzlysite` is a CNAME at GoDaddy (andraewilliams.com's DNS) pointing at 
 domain is set in the repo's Pages settings, so no `CNAME` file is needed in the build.
 
 Moving to Alex's own domain later: change the DNS CNAME and the Pages custom domain, set `SITE_URL` to it, delete
-`HOLD_BACK`. (**Vercel** also works: import the repo, framework preset Astro, same env vars. No adapter needed.)
+`DEMO_DATA` and then `HOLD_BACK`. (**Vercel** also works: import the repo, framework preset Astro, same env vars. No adapter needed.)
 
 ## Design
 
@@ -102,6 +103,10 @@ for the launch order and `docs/superpowers/specs/2026-10-29-seo-engine-design.md
   descriptions, JSON-LD parses and links, internal hrefs resolve, alt text, sitemap = indexable pages, robots and
   `noindex` agree with the build.
 - **Staging stays hidden:** `HOLD_BACK=1` keeps `noindex` + `Disallow: /` while URLs are already final-form.
+- **Demo mode** (`DEMO_DATA=1`, `src/lib/demo.ts`): every sample value is labelled, lives in one file, and is
+  never rendered without the variable. `missingConfig()` and `npm run check:config` still report what Alex owes.
+  `npm run test:e2e:demo` (port 4322) covers the demo-only behaviour: notice, mobile Call/Text/Quote bar, sample
+  reviews, illustrated before/after, in-page sample quote confirmation.
 
 ## Alex must fill in
 

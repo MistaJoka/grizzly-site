@@ -53,7 +53,12 @@ gh workflow run pages.yml -R MistaJoka/grizzly-site
 
 ## 3. Go live
 
+Demo mode first: `DEMO_DATA=1` fills Alex's blanks with labelled samples (a 555 phone number, an `.example`
+email, sample reviews). The build refuses `DEMO_DATA` on an indexable site, so this order matters.
+
 ```bash
+gh variable delete DEMO_DATA -R MistaJoka/grizzly-site     # samples off: only confirmed facts render
+npm run check:config                                        # anything still listed here is a blank on the live site
 gh variable delete HOLD_BACK -R MistaJoka/grizzly-site
 gh workflow run pages.yml -R MistaJoka/grizzly-site
 ```

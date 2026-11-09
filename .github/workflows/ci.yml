@@ -30,7 +30,11 @@ jobs:
         run: npm run test:seo
       - name: End-to-end tests
         run: npm run test:e2e
-      - name: Performance budget
-        run: npm run test:perf
-      - name: SEO audit (held-back build, as deployed to staging)
-        run: HOLD_BACK=1 npm run build && HOLD_BACK=1 npm run test:seo
+      - name: Demo end-to-end tests (DEMO_DATA=1, as deployed to staging)
+        run: npm run test:e2e:demo
+      - name: Performance budget (demo build, indexable only for the audit)
+        # Staging serves the demo build; DEMO_ALLOW_INDEXABLE lifts the guard so Lighthouse's SEO
+        # budget (minScore 1 needs robots to allow crawling) can run against it.
+        run: DEMO_DATA=1 DEMO_ALLOW_INDEXABLE=1 npm run build && npm run test:perf
+      - name: SEO audit (held-back demo build, exactly as deployed to staging)
+        run: HOLD_BACK=1 DEMO_DATA=1 npm run build && HOLD_BACK=1 DEMO_DATA=1 npm run test:seo
